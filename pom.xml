@@ -6,12 +6,12 @@
     <packaging>jar</packaging>
     <name>${project.groupId}:${project.artifactId}</name>
     <version>0.0.1</version>
-    <url>https://github.com/apivideo/android-api-client</url>
+    <url>https://github.com/apivideo/api.video-android-client</url>
     <description>api.video Android API client</description>
     <scm>
-        <connection>scm:git:git://github.com/apivideo/android-api-client.git</connection>
-        <developerConnection>scm:git:ssh://github.com:apivideo/android-api-client.git</developerConnection>
-        <url>https://github.com/apivideo/android-api-client</url>
+        <connection>scm:git:git://github.com/apivideo/api.video-android-client.git</connection>
+        <developerConnection>scm:git:ssh://github.com:apivideo/api.video-android-client.git</developerConnection>
+        <url>https://github.com/apivideo/api.video-android-client</url>
     </scm>
 
     <licenses>
