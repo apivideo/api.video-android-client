@@ -1,0 +1,99 @@
+/*
+ * Copyright 2013 Chris Banes
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+apply plugin: 'maven-publish'
+apply plugin: 'signing'
+
+def isReleaseBuild() {
+    return !"0.1.0".contains("SNAPSHOT")
+}
+
+def getReleaseRepositoryUrl() {
+    return hasProperty('RELEASE_REPOSITORY_URL') ? RELEASE_REPOSITORY_URL
+            : "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+}
+
+def getSnapshotRepositoryUrl() {
+    return hasProperty('SNAPSHOT_REPOSITORY_URL') ? SNAPSHOT_REPOSITORY_URL
+            : "https://oss.sonatype.org/content/repositories/snapshots/"
+}
+
+def getRepositoryUsername() {
+    return hasProperty('OSSRH_USERNAME') ? OSSRH_USERNAME : System.getenv("OSSRH_USERNAME")
+}
+
+def getRepositoryPassword() {
+    return hasProperty('OSSRH_PASSWORD') ? OSSRH_PASSWORD : System.getenv("OSSRH_PASSWORD")
+}
+
+afterEvaluate { project ->
+    publishing {
+        publications {
+            release(MavenPublication) {
+                from components.release
+
+                groupId = "video.api"
+                artifactId = "android-api-client"
+                version = "0.1.0"
+
+                pom {
+                    name = "video.api:android-api-client"
+                    packaging = "aar"
+                    description = "api.video Android API client"
+                    url = "https://github.com/apivideo/api.video-android-client"
+
+                    scm {
+                        url = "https://github.com/apivideo/api.video-android-client"
+                        connection = "scm:git:git://github.com/apivideo/api.video-android-client.git"
+                        developerConnection = "scm:git:ssh://github.com:apivideo/api.video-android-client.git"
+                    }
+
+                    licenses {
+                        license {
+                            name = "MIT License"
+                            url = "http://www.opensource.org/licenses/mit-license.php"
+                            distribution = "repo"
+                        }
+                    }
+
+                    developers {
+                        developer {
+                            name = "api.video ecosystem team"
+                            email = "ecosystem@api.video"
+                            organization = "api.video"
+                            organizationUrl = "https://api.video"
+                        }
+                    }
+                }
+            }
+        }
+        repositories {
+            maven {
+                url = isReleaseBuild() ? getReleaseRepositoryUrl() : getSnapshotRepositoryUrl()
+
+                credentials {
+                    username = getRepositoryUsername()
+                    password = getRepositoryPassword()
+                }
+            }
+        }
+    }
+
+    signing {
+        required { isReleaseBuild() && gradle.taskGraph.hasTask("uploadArchives") }
+        sign publishing.publications.release
+    }
+}
