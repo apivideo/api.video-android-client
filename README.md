@@ -14,6 +14,7 @@
     - [Gradle users](#gradle-users)
     - [Others](#others)
   - [Code sample](#code-sample)
+  - [Permissions](#permissions)
 - [Documentation](#documentation)
   - [API Endpoints](#api-endpoints)
     - [CaptionsApi](#captionsapi)
@@ -133,9 +134,21 @@ class MainActivity : AppCompatActivity() {
 
 ```
 
-## Example
+### Example
 
 An example that demonstrates how to use the API is provided in folder `example/`.
+
+## Permissions
+
+You have to add the following permissions in your `AndroidManifest.xml`:
+
+```xml
+    <uses-permission android:name="android.permission.INTERNET" />
+<!-- Application requires android.permission.READ_EXTERNAL_STORAGE to upload videos` -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+``` 
+
+Your application also has to dynamically request the `android.permission.READ_EXTERNAL_STORAGE` permission to upload videos.
 
 # Documentation
 
