@@ -14,6 +14,7 @@
     - [Gradle users](#gradle-users)
     - [Others](#others)
   - [Code sample](#code-sample)
+  - [Permissions](#permissions)
 - [Documentation](#documentation)
   - [API Endpoints](#api-endpoints)
     - [CaptionsApi](#captionsapi)
@@ -54,7 +55,7 @@ Add this dependency to your project's POM:
 <dependency>
   <groupId>video.api</groupId>
   <artifactId>android-api-client</artifactId>
-  <version>0.0.1</version>
+  <version>0.1.0</version>
   <scope>compile</scope>
 </dependency>
 ```
@@ -64,7 +65,7 @@ Add this dependency to your project's POM:
 Add this dependency to your project's build file:
 
 ```groovy
-implementation "video.api:android-api-client:0.0.1"
+implementation "video.api:android-api-client:0.1.0"
 ```
 
 ### Others
@@ -77,7 +78,7 @@ mvn clean package
 
 Then manually install the following JARs:
 
-* `target/android-api-client-0.0.1.jar`
+* `target/android-api-client-0.1.0.jar`
 * `target/lib/*.jar`
 
 ## Code sample
@@ -133,9 +134,21 @@ class MainActivity : AppCompatActivity() {
 
 ```
 
-## Example
+### Example
 
 An example that demonstrates how to use the API is provided in folder `example/`.
+
+## Permissions
+
+You have to add the following permissions in your `AndroidManifest.xml`:
+
+```xml
+    <uses-permission android:name="android.permission.INTERNET" />
+<!-- Application requires android.permission.READ_EXTERNAL_STORAGE to upload videos` -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+``` 
+
+Your application also has to dynamically request the `android.permission.READ_EXTERNAL_STORAGE` permission to upload videos.
 
 # Documentation
 
