@@ -55,7 +55,7 @@ Add this dependency to your project's POM:
 <dependency>
   <groupId>video.api</groupId>
   <artifactId>android-api-client</artifactId>
-  <version>0.1.0</version>
+  <version>0.2.0</version>
   <scope>compile</scope>
 </dependency>
 ```
@@ -65,7 +65,7 @@ Add this dependency to your project's POM:
 Add this dependency to your project's build file:
 
 ```groovy
-implementation "video.api:android-api-client:0.1.0"
+implementation "video.api:android-api-client:0.2.0"
 ```
 
 ### Others
@@ -78,7 +78,7 @@ mvn clean package
 
 Then manually install the following JARs:
 
-* `target/android-api-client-0.1.0.jar`
+* `target/android-api-client-0.2.0.jar`
 * `target/lib/*.jar`
 
 ## Code sample
@@ -241,7 +241,7 @@ Method | HTTP request | Description
 ------------- | ------------- | -------------
 [**delete**](docs/PlayerThemesApi.md#delete) | **DELETE** /players/{playerId} | Delete a player
 [**deleteLogo**](docs/PlayerThemesApi.md#deleteLogo) | **DELETE** /players/{playerId}/logo | Delete logo
-[**list**](docs/PlayerThemesApi.md#list) | **GET** /players | List all players
+[**list**](docs/PlayerThemesApi.md#list) | **GET** /players | List all player themes
 [**get**](docs/PlayerThemesApi.md#get) | **GET** /players/{playerId} | Show a player
 [**update**](docs/PlayerThemesApi.md#update) | **PATCH** /players/{playerId} | Update a player
 [**create**](docs/PlayerThemesApi.md#create) | **POST** /players | Create a player
