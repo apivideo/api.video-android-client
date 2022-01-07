@@ -1,6 +1,9 @@
 # Changelog
 All changes to this project will be documented in this file.
 
+## [0.2.2] - 2022-01-06
+- Update min Sdk version to Android API 24
+
 ## [0.2.1] - 2021-12-13
 - Add an interface for progressive upload session
 
