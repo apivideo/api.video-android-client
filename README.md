@@ -24,6 +24,7 @@
     - [RawStatisticsApi](#rawstatisticsapi)
     - [UploadTokensApi](#uploadtokensapi)
     - [VideosApi](#videosapi)
+    - [WatermarksApi](#watermarksapi)
     - [WebhooksApi](#webhooksapi)
   - [Models](#models)
   - [Authorization](#documentation-for-authorization)
@@ -55,7 +56,7 @@ Add this dependency to your project's POM:
 <dependency>
   <groupId>video.api</groupId>
   <artifactId>android-api-client</artifactId>
-  <version>0.2.2</version>
+  <version>1.0.0</version>
   <scope>compile</scope>
 </dependency>
 ```
@@ -65,7 +66,7 @@ Add this dependency to your project's POM:
 Add this dependency to your project's build file:
 
 ```groovy
-implementation "video.api:android-api-client:0.2.2"
+implementation "video.api:android-api-client:1.0.0"
 ```
 
 ### Others
@@ -78,7 +79,7 @@ mvn clean package
 
 Then manually install the following JARs:
 
-* `target/android-api-client-0.2.2.jar`
+* `target/android-api-client-1.0.0.jar`
 * `target/lib/*.jar`
 
 ## Code sample
@@ -316,6 +317,26 @@ Method | HTTP request | Description
 [**uploadThumbnail**](docs/VideosApi.md#uploadThumbnail) | **POST** /videos/{videoId}/thumbnail | Upload a thumbnail
 
 
+### WatermarksApi
+
+
+#### Retrieve an instance of WatermarksApi:
+```kotlin
+val client = ApiVideoClient("YOUR_API_TOKEN")
+val watermarks = client.watermarks()
+```
+
+
+
+#### Endpoints
+
+Method | HTTP request | Description
+------------- | ------------- | -------------
+[**delete**](docs/WatermarksApi.md#delete) | **DELETE** /watermarks/{watermarkId} | Delete a watermark
+[**list**](docs/WatermarksApi.md#list) | **GET** /watermarks | List all watermarks
+[**upload**](docs/WatermarksApi.md#upload) | **POST** /watermarks | Upload a watermark
+
+
 ### WebhooksApi
 
 
@@ -381,6 +402,7 @@ Method | HTTP request | Description
  - [UploadToken](docs/UploadToken.md)
  - [Video](docs/Video.md)
  - [VideoAssets](docs/VideoAssets.md)
+ - [VideoClip](docs/VideoClip.md)
  - [VideoCreationPayload](docs/VideoCreationPayload.md)
  - [VideoSession](docs/VideoSession.md)
  - [VideoSessionClient](docs/VideoSessionClient.md)
@@ -398,7 +420,10 @@ Method | HTTP request | Description
  - [VideoStatusIngest](docs/VideoStatusIngest.md)
  - [VideoThumbnailPickPayload](docs/VideoThumbnailPickPayload.md)
  - [VideoUpdatePayload](docs/VideoUpdatePayload.md)
+ - [VideoWatermark](docs/VideoWatermark.md)
  - [VideosListResponse](docs/VideosListResponse.md)
+ - [Watermark](docs/Watermark.md)
+ - [WatermarksListResponse](docs/WatermarksListResponse.md)
  - [Webhook](docs/Webhook.md)
  - [WebhooksCreationPayload](docs/WebhooksCreationPayload.md)
  - [WebhooksListResponse](docs/WebhooksListResponse.md)
