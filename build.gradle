@@ -26,7 +26,7 @@ allprojects {
     }
 }
 
-if(hasProperty('target') && target == 'android') {
+if (hasProperty('target') && target == 'android') {
     apply plugin: 'com.android.library'
     apply plugin: 'de.mannodermaus.android-junit5'
     apply from: 'maven-push.gradle'
@@ -41,6 +41,7 @@ if(hasProperty('target') && target == 'android') {
 
             testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
             testInstrumentationRunnerArgument("runnerBuilder", "de.mannodermaus.junit5.AndroidJUnit5Builder")
+            testInstrumentationRunnerArgument("environmentVariables", "INTEGRATION_TESTS_API_TOKEN=${System.getenv("INTEGRATION_TESTS_API_TOKEN")}")
         }
 
         compileOptions {
@@ -64,13 +65,13 @@ if(hasProperty('target') && target == 'android') {
         }
     }
 
-    task execute(type:JavaExec) {
+    task execute(type: JavaExec) {
         main = System.getProperty('mainClass')
         classpath = sourceSets.main.runtimeClasspath
     }
 
     javadoc {
-        options.tags = [ "http.response.details:a:Http Response Details" ]
+        options.tags = ["http.response.details:a:Http Response Details"]
     }
 
     sourceSets {

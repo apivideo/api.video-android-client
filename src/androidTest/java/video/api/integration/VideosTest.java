@@ -26,8 +26,8 @@ public class VideosTest {
 
     final ApiVideoClient apiClient;
 
-    public VideosTest() {
-        this.apiClient = new ApiVideoClient(System.getenv().get("INTEGRATION_TESTS_API_TOKEN"),
+    public VideosTest() throws IOException {
+        this.apiClient = new ApiVideoClient(Utils.getApiKey(),
                 Environment.SANDBOX);
     }
 

@@ -10,7 +10,9 @@ import video.api.client.api.models.Environment;
 import video.api.client.api.models.Page;
 import video.api.client.api.models.Webhook;
 import video.api.client.api.models.WebhooksCreationPayload;
+import video.api.integration.utils.Utils;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -25,8 +27,8 @@ public class WebhooksTest {
     private final ApiVideoClient apiClient;
     private Webhook webhook;
 
-    public WebhooksTest() {
-        this.apiClient = new ApiVideoClient(System.getenv().get("INTEGRATION_TESTS_API_TOKEN"),
+    public WebhooksTest() throws IOException {
+        this.apiClient = new ApiVideoClient(Utils.getApiKey(),
                 Environment.SANDBOX);
     }
 
