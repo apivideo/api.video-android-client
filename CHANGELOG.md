@@ -1,6 +1,9 @@
 # Changelog
 All changes to this project will be documented in this file.
 
+## [1.0.6] - 2022-07-05
+- Add SDK origin header
+
 ## [1.0.5] - 2022-04-21
 - Fix `video.publishedAt` type
 
