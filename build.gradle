@@ -4,7 +4,7 @@ apply plugin: 'com.diffplug.spotless'
 apply plugin: 'maven-publish'
 
 group = 'video.api'
-version = '1.0.6'
+version = '1.1.0'
 
 buildscript {
     repositories {
@@ -82,7 +82,7 @@ if(hasProperty('target') && target == 'android') {
 dependencies {
     implementation 'io.swagger:swagger-annotations:1.5.24'
     implementation "com.google.code.findbugs:jsr305:3.0.2"
-    implementation 'com.squareup.okhttp3:okhttp:4.9.1'
+    api 'com.squareup.okhttp3:okhttp:4.9.2'
     implementation 'com.squareup.okhttp3:logging-interceptor:4.9.1'
     implementation 'com.google.code.gson:gson:2.8.9'
     implementation 'io.gsonfire:gson-fire:1.8.4'
