@@ -12,13 +12,15 @@ import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.core.app.NotificationCompat
+import com.google.common.collect.HashMultimap
+import com.google.common.collect.Multimaps
 import video.api.client.api.ApiClient
 import video.api.client.api.R
 import video.api.client.api.clients.VideosApi
 import video.api.client.api.models.Environment
 import video.api.client.api.models.Video
+import video.api.client.api.upload.IProgressiveUploadSession
 import java.io.File
-import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.Executors
 import java.util.concurrent.Future
 
@@ -51,7 +53,8 @@ open class UploadService(
     @DrawableRes protected val notificationIconResourceId: Int = R.drawable.ic_api_video_logo,
     @ColorRes protected val notificationColorResourceId: Int = R.color.primary_orange
 ) : Service() {
-    private val uploadTasksMap = ConcurrentHashMap<String, Future<Video>>()
+    private val uploadTasksMap =
+        Multimaps.synchronizedMultimap<String, Future<Video>>(HashMultimap.create())
     private val binder = UploadServiceBinder()
     private lateinit var apiClient: ApiClient
     private lateinit var videosApi: VideosApi
@@ -169,9 +172,11 @@ open class UploadService(
      * @param videoIdOrToken The video id or token of the upload to cancel
      */
     fun cancel(videoIdOrToken: String) {
-        uploadTasksMap[videoIdOrToken]?.let {
-            _numOfCancelled++
-            it.cancel(true)
+        uploadTasksMap[videoIdOrToken].let { set ->
+            set.forEach { future ->
+                _numOfCancelled++
+                future.cancel(true)
+            }
         }
     }
 
@@ -181,7 +186,7 @@ open class UploadService(
      * Also clean counter and flush internal list
      */
     fun cancelAll() {
-        uploadTasksMap.keys.forEach { cancel(it) }
+        uploadTasksMap.keySet().forEach { cancel(it) }
         uploadTasksMap.clear()
 
         _numOfUploaded = 0
@@ -297,23 +302,25 @@ open class UploadService(
     fun upload(videoId: String, file: File) {
         if (uploadTasksMap.containsKey(videoId)) {
             cancel(videoId)
-            uploadTasksMap.remove(videoId)
+            uploadTasksMap.removeAll(videoId)
         } else {
             _totalNumOfUploads++
         }
 
-        uploadTasksMap[videoId] = executor.submit(
-            UploadTask(
-                videoId,
-                file,
-                { videoIdOrToken, fileToUpload, progressListener ->
-                    videosApi.upload(
-                        videoIdOrToken,
-                        fileToUpload,
-                        progressListener
-                    )
-                },
-                listener
+        uploadTasksMap.put(
+            videoId, executor.submit(
+                UploadTask(
+                    videoId,
+                    file,
+                    { videoIdOrToken, fileToUpload, progressListener ->
+                        videosApi.upload(
+                            videoIdOrToken,
+                            fileToUpload,
+                            progressListener
+                        )
+                    },
+                    listener
+                )
             )
         )
     }
@@ -337,25 +344,192 @@ open class UploadService(
     fun uploadWithUploadToken(token: String, file: File) {
         if (uploadTasksMap.containsKey(token)) {
             cancel(token)
-            uploadTasksMap.remove(token)
+            uploadTasksMap.removeAll(token)
         } else {
             _totalNumOfUploads++
         }
 
-        uploadTasksMap[token] = executor.submit(
-            UploadTask(
-                token,
-                file,
-                { videoIdOrToken, fileToUpload, progressListener ->
-                    videosApi.uploadWithUploadToken(
-                        videoIdOrToken,
-                        fileToUpload,
-                        progressListener
-                    )
-                },
-                listener
+        uploadTasksMap.put(
+            token, executor.submit(
+                UploadTask(
+                    token,
+                    file,
+                    { videoIdOrToken, fileToUpload, progressListener ->
+                        videosApi.uploadWithUploadToken(
+                            videoIdOrToken,
+                            fileToUpload,
+                            progressListener
+                        )
+                    },
+                    listener
+                )
             )
         )
+    }
+
+    /**
+     * A decorator for progression upload session.
+     *
+     * @param session The progressive upload session either for upload token or video id
+     * @param videoIdOrToken The video id or token
+     */
+    inner class ProgressiveSession(
+        private val session: IProgressiveUploadSession,
+        private val videoIdOrToken: String
+    ) {
+        /**
+         * Upload a single part (not the last).
+         *
+         * @param filePath The path of the file to upload
+         */
+        fun uploadPart(filePath: String) =
+            uploadPart(File(filePath))
+
+        /**
+         * Upload a single part (not the last).
+         *
+         * @param file The file to upload
+         */
+        fun uploadPart(file: File) {
+            uploadTasksMap.put(
+                videoIdOrToken, executor.submit(
+                    UploadTask(
+                        videoIdOrToken,
+                        file,
+                        { _, fileToUpload, progressListener ->
+                            session.uploadPart(
+                                fileToUpload
+                            ) { bytesWritten, totalBytes ->
+                                progressListener.onProgress(
+                                    bytesWritten,
+                                    totalBytes,
+                                    0,
+                                    0
+                                )
+                            }
+                        },
+                        listener
+                    )
+                )
+            )
+        }
+
+        /**
+         * Upload a single part (not the last).
+         *
+         * @param filePath The path of the file to upload
+         * @param partId The part id
+         */
+        fun uploadPart(filePath: String, partId: Int) =
+            uploadPart(File(filePath), partId)
+
+        /**
+         * Upload a single part (not the last).
+         *
+         * @param file The file to upload
+         * @param partId The part id
+         */
+        fun uploadPart(file: File, partId: Int) {
+            uploadTasksMap.put(
+                videoIdOrToken, executor.submit(
+                    UploadTask(
+                        videoIdOrToken,
+                        file,
+                        { _, fileToUpload, progressListener ->
+                            session.uploadPart(
+                                fileToUpload,
+                                partId
+                            ) { bytesWritten, totalBytes ->
+                                progressListener.onProgress(
+                                    bytesWritten,
+                                    totalBytes,
+                                    0,
+                                    0
+                                )
+                            }
+                        },
+                        listener
+                    )
+                )
+            )
+        }
+
+        /**
+         * Upload the last part.
+         *
+         * @param filePath The path of the file to upload
+         */
+        fun uploadLastPart(filePath: String) =
+            uploadLastPart(File(filePath))
+
+        /**
+         * Upload the last part.
+         *
+         * @param file The file to upload
+         */
+        fun uploadLastPart(file: File) {
+            uploadTasksMap.put(
+                videoIdOrToken, executor.submit(
+                    UploadTask(
+                        videoIdOrToken,
+                        file,
+                        { _, fileToUpload, progressListener ->
+                            session.uploadLastPart(
+                                fileToUpload
+                            ) { bytesWritten, totalBytes ->
+                                progressListener.onProgress(
+                                    bytesWritten,
+                                    totalBytes,
+                                    0,
+                                    0
+                                )
+                            }
+                        },
+                        listener
+                    )
+                )
+            )
+        }
+
+        /**
+         * Upload the last part.
+         *
+         * @param filePath The path of the file to upload
+         * @param partId The part id
+         */
+        fun uploadLastPart(filePath: String, partId: Int) =
+            uploadLastPart(File(filePath), partId)
+
+        /**
+         * Upload the last part.
+         *
+         * @param file The file to upload
+         * @param partId The part id
+         */
+        fun uploadLastPart(file: File, partId: Int) {
+            uploadTasksMap.put(
+                videoIdOrToken, executor.submit(
+                    UploadTask(
+                        videoIdOrToken,
+                        file,
+                        { _, fileToUpload, progressListener ->
+                            session.uploadLastPart(
+                                fileToUpload,
+                                partId
+                            ) { bytesWritten, totalBytes ->
+                                progressListener.onProgress(
+                                    bytesWritten,
+                                    totalBytes,
+                                    0,
+                                    0
+                                )
+                            }
+                        },
+                        listener
+                    )
+                )
+            )
+        }
     }
 
     override fun onCreate() {
