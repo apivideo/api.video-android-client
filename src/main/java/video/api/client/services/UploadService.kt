@@ -56,7 +56,6 @@ open class UploadService(
     private val uploadTasksMap =
         Multimaps.synchronizedMultimap<String, Future<Video>>(HashMultimap.create())
     private val binder = UploadServiceBinder()
-    private lateinit var apiClient: ApiClient
     private lateinit var videosApi: VideosApi
 
     private val executor = Executors.newSingleThreadExecutor()
@@ -368,12 +367,25 @@ open class UploadService(
     }
 
     /**
+     * Creates a [ProgressiveUploadSession].
+     *
+     * @param session The progressive upload session either for upload token or video id
+     * @param videoIdOrToken The video id or token
+     */
+    fun createProgressiveUploadSession(
+        session: IProgressiveUploadSession,
+        videoIdOrToken: String
+    ): ProgressiveUploadSession {
+        return ProgressiveUploadSession(session, videoIdOrToken)
+    }
+
+    /**
      * A decorator for progression upload session.
      *
      * @param session The progressive upload session either for upload token or video id
      * @param videoIdOrToken The video id or token
      */
-    inner class ProgressiveSession(
+    inner class ProgressiveUploadSession(
         private val session: IProgressiveUploadSession,
         private val videoIdOrToken: String
     ) {
@@ -391,6 +403,8 @@ open class UploadService(
          * @param file The file to upload
          */
         fun uploadPart(file: File) {
+            _totalNumOfUploads++
+
             uploadTasksMap.put(
                 videoIdOrToken, executor.submit(
                     UploadTask(
@@ -430,6 +444,8 @@ open class UploadService(
          * @param partId The part id
          */
         fun uploadPart(file: File, partId: Int) {
+            _totalNumOfUploads++
+
             uploadTasksMap.put(
                 videoIdOrToken, executor.submit(
                     UploadTask(
@@ -468,6 +484,8 @@ open class UploadService(
          * @param file The file to upload
          */
         fun uploadLastPart(file: File) {
+            _totalNumOfUploads++
+
             uploadTasksMap.put(
                 videoIdOrToken, executor.submit(
                     UploadTask(
@@ -507,6 +525,8 @@ open class UploadService(
          * @param partId The part id
          */
         fun uploadLastPart(file: File, partId: Int) {
+            _totalNumOfUploads++
+
             uploadTasksMap.put(
                 videoIdOrToken, executor.submit(
                     UploadTask(
@@ -545,7 +565,7 @@ open class UploadService(
         val basePath = intent.getStringExtra(BASE_PATH_KEY) ?: Environment.SANDBOX.basePath
         val apiKey = intent.getStringExtra(API_KEY_KEY)
 
-        apiClient = apiKey?.let {
+        val apiClient = apiKey?.let {
             ApiClient(it, basePath)
         } ?: ApiClient(basePath)
 
@@ -553,6 +573,20 @@ open class UploadService(
             val timeout = intent.getIntExtra(TIMEOUT_KEY, 0)
             apiClient.writeTimeout = timeout
             apiClient.readTimeout = timeout
+        }
+
+        val sdkName = intent.getStringExtra(SDK_NAME_KEY)
+        val sdkVersion = intent.getStringExtra(SDK_VERSION_KEY)
+        if (sdkName != null && sdkVersion != null) {
+            apiClient.setSdkName(sdkName, sdkVersion)
+        } else {
+            apiClient.setSdkName("service", "1.0.0")
+        }
+
+        val appName = intent.getStringExtra(APP_NAME_KEY)
+        val appVersion = intent.getStringExtra(APP_VERSION_KEY)
+        if (appName != null && appVersion != null) {
+            apiClient.setSdkName(appName, appVersion)
         }
 
         videosApi = VideosApi(apiClient)
@@ -588,6 +622,10 @@ open class UploadService(
         const val BASE_PATH_KEY = "base_path_key"
         const val API_KEY_KEY = "api_key_key"
         const val TIMEOUT_KEY = "timeout_key"
+        const val SDK_NAME_KEY = "sdk_name_key"
+        const val SDK_VERSION_KEY = "sdk_version_key"
+        const val APP_NAME_KEY = "app_name_key"
+        const val APP_VERSION_KEY = "app_version_key"
 
         /**
          * Start a child of [UploadService].
@@ -599,6 +637,10 @@ open class UploadService(
          * @param timeout The API timeout in milliseconds
          * @param onServiceCreated The callback that returns the [UploadService] instance
          * @param onServiceDisconnected Called when service has been disconnected
+         * @param appName The application name for stats
+         * @param appVersion The application version for stats
+         * @param sdkName The SDK name for stats (internal usage only)
+         * @param sdkVersion The SDK version for stats (internal usage only)
          */
         fun startService(
             context: Context,
@@ -607,7 +649,11 @@ open class UploadService(
             environment: Environment = Environment.PRODUCTION,
             timeout: Int? = null,
             onServiceCreated: (UploadService) -> Unit,
-            onServiceDisconnected: (name: ComponentName?) -> Unit
+            onServiceDisconnected: (name: ComponentName?) -> Unit,
+            appName: String? = null,
+            appVersion: String? = null,
+            sdkName: String? = null,
+            sdkVersion: String? = null
         ) {
             val connection = object : ServiceConnection {
                 override fun onServiceConnected(name: ComponentName?, binder: IBinder) {
@@ -625,6 +671,10 @@ open class UploadService(
                 apiKey?.let { putExtra(API_KEY_KEY, it) }
                 putExtra(BASE_PATH_KEY, environment.basePath)
                 timeout?.let { putExtra(TIMEOUT_KEY, it) }
+                sdkName?.let { putExtra(SDK_NAME_KEY, it) }
+                sdkVersion?.let { putExtra(SDK_VERSION_KEY, it) }
+                appName?.let { putExtra(APP_NAME_KEY, it) }
+                appVersion?.let { putExtra(APP_VERSION_KEY, it) }
             }
 
             context.bindService(
