@@ -1,7 +1,6 @@
 package video.api.client.services
 
 import android.util.Log
-import com.google.common.base.Throwables
 import video.api.client.api.models.Video
 import video.api.client.api.upload.UploadProgressListener
 import java.io.File
@@ -9,9 +8,9 @@ import java.io.InterruptedIOException
 import java.util.concurrent.Callable
 
 class UploadTask(
-    private val videoIdOrToken: String,
+    private val id: String,
     private val file: File,
-    private val onUploadTask: (String, File, UploadProgressListener) -> Video,
+    private val onUploadTask: (File, UploadProgressListener) -> Video,
     private val listener: UploadServiceListener
 ) : Callable<Video> {
     companion object {
@@ -20,20 +19,20 @@ class UploadTask(
 
     override fun call(): Video {
         return try {
-            listener.onUploadStarted(videoIdOrToken)
+            listener.onUploadStarted(id)
             val video =
-                onUploadTask(videoIdOrToken, file) { bytesWritten, totalBytes, _, _ ->
+                onUploadTask(file) { bytesWritten, totalBytes, _, _ ->
                     val progress = (bytesWritten.toFloat() / totalBytes * 100).toInt()
-                    listener.onUploadProgress(videoIdOrToken, progress)
+                    listener.onUploadProgress(id, progress)
                 }
             listener.onUploadComplete(video)
             video
         } catch (e: Exception) {
-            if (Throwables.getRootCause(e) is InterruptedIOException) {
+            if (e.rootCause is InterruptedIOException) {
                 Log.i(TAG, "Interrupt by user")
-                listener.onUploadCancelled(videoIdOrToken)
+                listener.onUploadCancelled(id)
             } else {
-                listener.onUploadError(videoIdOrToken, e)
+                listener.onUploadError(id, e)
             }
             throw e
         }

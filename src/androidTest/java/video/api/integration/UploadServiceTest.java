@@ -72,6 +72,7 @@ public class UploadServiceTest {
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)
     class Upload {
         private Video testVideo;
+        private UploadServiceListener listener;
 
         @BeforeAll
         public void createVideo() throws ApiException {
@@ -86,34 +87,35 @@ public class UploadServiceTest {
             AtomicLong progressAtomic = new AtomicLong(0);
             CountDownLatch successLatch = new CountDownLatch(1);
 
-            uploadService.addListener(new UploadServiceListener() {
-                                          @Override
-                                          public void onLastUpload() {
-                                          }
+            listener = new UploadServiceListener() {
+                @Override
+                public void onLastUpload() {
+                }
 
-                                          @Override
-                                          public void onUploadComplete(@NonNull Video video) {
-                                              successLatch.countDown();
-                                          }
+                @Override
+                public void onUploadComplete(@NonNull Video video) {
+                    successLatch.countDown();
+                }
 
-                                          @Override
-                                          public void onUploadCancelled(@NonNull String videoIdOrToken) {
-                                          }
+                @Override
+                public void onUploadCancelled(@NonNull String id) {
+                }
 
-                                          @Override
-                                          public void onUploadError(@NonNull String videoIdOrToken, @NonNull Exception e) {
-                                          }
+                @Override
+                public void onUploadError(@NonNull String id, @NonNull Exception e) {
+                }
 
-                                          @Override
-                                          public void onUploadProgress(@NonNull String videoIdOrToken, int progress) {
-                                              progressAtomic.set(progress);
-                                          }
+                @Override
+                public void onUploadProgress(@NonNull String id, int progress) {
+                    progressAtomic.set(progress);
+                }
 
-                                          @Override
-                                          public void onUploadStarted(@NonNull String videoIdOrToken) {
-                                          }
-                                      }
-            );
+                @Override
+                public void onUploadStarted(@NonNull String id) {
+                }
+            };
+
+            uploadService.addListener(listener);
             uploadService.upload(testVideo.getVideoId(), mp4File);
 
             successLatch.await(60, TimeUnit.SECONDS);
@@ -130,34 +132,35 @@ public class UploadServiceTest {
             CountDownLatch successLatch = new CountDownLatch(0);
             CountDownLatch errorLatch = new CountDownLatch(1);
 
-            uploadService.addListener(new UploadServiceListener() {
-                                          @Override
-                                          public void onLastUpload() {
-                                          }
+            listener = new UploadServiceListener() {
+                @Override
+                public void onLastUpload() {
+                }
 
-                                          @Override
-                                          public void onUploadComplete(@NonNull Video video) {
-                                              successLatch.countDown();
-                                          }
+                @Override
+                public void onUploadComplete(@NonNull Video video) {
+                    successLatch.countDown();
+                }
 
-                                          @Override
-                                          public void onUploadCancelled(@NonNull String videoIdOrToken) {
-                                          }
+                @Override
+                public void onUploadCancelled(@NonNull String id) {
+                }
 
-                                          @Override
-                                          public void onUploadError(@NonNull String videoIdOrToken, @NonNull Exception e) {
-                                              errorLatch.countDown();
-                                          }
+                @Override
+                public void onUploadError(@NonNull String id, @NonNull Exception e) {
+                    errorLatch.countDown();
+                }
 
-                                          @Override
-                                          public void onUploadProgress(@NonNull String videoIdOrToken, int progress) {
-                                          }
+                @Override
+                public void onUploadProgress(@NonNull String id, int progress) {
+                }
 
-                                          @Override
-                                          public void onUploadStarted(@NonNull String videoIdOrToken) {
-                                          }
-                                      }
-            );
+                @Override
+                public void onUploadStarted(@NonNull String id) {
+                }
+            };
+
+            uploadService.addListener(listener);
             uploadService.upload("WRONG VIDEO ID", mp4File);
 
             errorLatch.await(60, TimeUnit.SECONDS);
@@ -177,39 +180,40 @@ public class UploadServiceTest {
             CountDownLatch cancelLatch = new CountDownLatch(1);
             CountDownLatch successLatch = new CountDownLatch(0);
 
-            uploadService.addListener(new UploadServiceListener() {
-                                          @Override
-                                          public void onLastUpload() {
-                                          }
+            listener = new UploadServiceListener() {
+                @Override
+                public void onLastUpload() {
+                }
 
-                                          @Override
-                                          public void onUploadComplete(@NonNull Video video) {
-                                              successLatch.countDown();
-                                          }
+                @Override
+                public void onUploadComplete(@NonNull Video video) {
+                    successLatch.countDown();
+                }
 
-                                          @Override
-                                          public void onUploadCancelled(@NonNull String videoIdOrToken) {
-                                              cancelLatch.countDown();
-                                          }
+                @Override
+                public void onUploadCancelled(@NonNull String id) {
+                    cancelLatch.countDown();
+                }
 
-                                          @Override
-                                          public void onUploadError(@NonNull String videoIdOrToken, @NonNull Exception e) {
-                                          }
+                @Override
+                public void onUploadError(@NonNull String id, @NonNull Exception e) {
+                }
 
-                                          @Override
-                                          public void onUploadProgress(@NonNull String videoIdOrToken, int progress) {
-                                          }
+                @Override
+                public void onUploadProgress(@NonNull String id, int progress) {
+                }
 
-                                          @Override
-                                          public void onUploadStarted(@NonNull String videoIdOrToken) {
-                                              uploadStartedLatch.countDown();
-                                          }
-                                      }
-            );
-            uploadService.upload(testVideo.getVideoId(), mp4File);
+                @Override
+                public void onUploadStarted(@NonNull String id) {
+                    uploadStartedLatch.countDown();
+                }
+            };
+
+            uploadService.addListener(listener);
+            String id = uploadService.upload(testVideo.getVideoId(), mp4File);
 
             uploadStartedLatch.await(2, TimeUnit.SECONDS); // Wait till upload start
-            uploadService.cancel(testVideo.getVideoId());
+            uploadService.cancel(id);
             cancelLatch.await(60, TimeUnit.SECONDS);
 
             assertThat(successLatch.getCount()).isEqualTo(0);
@@ -220,7 +224,8 @@ public class UploadServiceTest {
         }
 
         @AfterEach
-        public void clear() throws ApiException {
+        public void clearService() {
+            uploadService.removeListener(listener);
             uploadService.cancelAll();
         }
 
@@ -236,6 +241,7 @@ public class UploadServiceTest {
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)
     class UploadWithUploadToken {
         private UploadToken testUploadToken;
+        private UploadServiceListener listener;
 
         @BeforeAll
         public void createToken() throws ApiException {
@@ -249,34 +255,35 @@ public class UploadServiceTest {
             AtomicLong progressAtomic = new AtomicLong(0);
             CountDownLatch successLatch = new CountDownLatch(1);
 
-            uploadService.addListener(new UploadServiceListener() {
-                                          @Override
-                                          public void onLastUpload() {
-                                          }
+            listener = new UploadServiceListener() {
+                @Override
+                public void onLastUpload() {
+                }
 
-                                          @Override
-                                          public void onUploadComplete(@NonNull Video video) {
-                                              successLatch.countDown();
-                                          }
+                @Override
+                public void onUploadComplete(@NonNull Video video) {
+                    successLatch.countDown();
+                }
 
-                                          @Override
-                                          public void onUploadCancelled(@NonNull String videoIdOrToken) {
-                                          }
+                @Override
+                public void onUploadCancelled(@NonNull String id) {
+                }
 
-                                          @Override
-                                          public void onUploadError(@NonNull String videoIdOrToken, @NonNull Exception e) {
-                                          }
+                @Override
+                public void onUploadError(@NonNull String id, @NonNull Exception e) {
+                }
 
-                                          @Override
-                                          public void onUploadProgress(@NonNull String videoIdOrToken, int progress) {
-                                              progressAtomic.set(progress);
-                                          }
+                @Override
+                public void onUploadProgress(@NonNull String id, int progress) {
+                    progressAtomic.set(progress);
+                }
 
-                                          @Override
-                                          public void onUploadStarted(@NonNull String videoIdOrToken) {
-                                          }
-                                      }
-            );
+                @Override
+                public void onUploadStarted(@NonNull String id) {
+                }
+            };
+
+            uploadService.addListener(listener);
             uploadService.uploadWithUploadToken(testUploadToken.getToken(), mp4File);
 
             successLatch.await(60, TimeUnit.SECONDS);
@@ -286,10 +293,15 @@ public class UploadServiceTest {
             assertThat(uploadService.getTotalNumOfUploads()).isEqualTo(1);
         }
 
+        @AfterEach
+        public void clearService() {
+            uploadService.removeListener(listener);
+            uploadService.cancelAll();
+        }
+
         @AfterAll
         public void deleteVideo() throws ApiException {
             apiClient.uploadTokens().deleteToken(testUploadToken.getToken());
-            uploadService.cancelAll();
         }
     }
 
@@ -298,6 +310,7 @@ public class UploadServiceTest {
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)
     class ProgressiveUpload {
         private Video testVideo;
+        private UploadServiceListener listener;
 
         @BeforeAll
         public void createVideo() throws ApiException {
@@ -314,35 +327,37 @@ public class UploadServiceTest {
             CountDownLatch successLatch = new CountDownLatch(3);
 
             VideosApi.UploadProgressiveSession uploadProgressiveSession = apiClient.videos().createUploadProgressiveSession(this.testVideo.getVideoId());
-            UploadService.ProgressiveUploadSession session = uploadService.createProgressiveUploadSession(uploadProgressiveSession, this.testVideo.getVideoId());
+            UploadService.ProgressiveUploadSession session = uploadService.createProgressiveUploadSession(uploadProgressiveSession);
 
-            uploadService.addListener(new UploadServiceListener() {
-                                          @Override
-                                          public void onLastUpload() {
-                                          }
+            listener = new UploadServiceListener() {
+                @Override
+                public void onLastUpload() {
+                }
 
-                                          @Override
-                                          public void onUploadComplete(@NonNull Video video) {
-                                              successLatch.countDown();
-                                          }
+                @Override
+                public void onUploadComplete(@NonNull Video video) {
+                    successLatch.countDown();
+                }
 
-                                          @Override
-                                          public void onUploadCancelled(@NonNull String videoIdOrToken) {
-                                          }
+                @Override
+                public void onUploadCancelled(@NonNull String id) {
+                }
 
-                                          @Override
-                                          public void onUploadError(@NonNull String videoIdOrToken, @NonNull Exception e) {
-                                          }
+                @Override
+                public void onUploadError(@NonNull String id, @NonNull Exception e) {
+                }
 
-                                          @Override
-                                          public void onUploadProgress(@NonNull String videoIdOrToken, int progress) {
-                                          }
+                @Override
+                public void onUploadProgress(@NonNull String id, int progress) {
+                }
 
-                                          @Override
-                                          public void onUploadStarted(@NonNull String videoIdOrToken) {
-                                          }
-                                      }
-            );
+                @Override
+                public void onUploadStarted(@NonNull String id) {
+                }
+            };
+
+            uploadService.addListener(listener);
+
             session.uploadPart(part1);
             session.uploadPart(part2);
             session.uploadLastPart(part3);
@@ -352,6 +367,12 @@ public class UploadServiceTest {
             assertThat(successLatch.getCount()).isEqualTo(0);
             assertThat(uploadService.getNumOfRemaining()).isEqualTo(0);
             assertThat(uploadService.getTotalNumOfUploads()).isEqualTo(3);
+        }
+
+        @AfterEach
+        public void clearService() {
+            uploadService.removeListener(listener);
+            uploadService.cancelAll();
         }
 
         @AfterAll

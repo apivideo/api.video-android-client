@@ -12,8 +12,6 @@ import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.core.app.NotificationCompat
-import com.google.common.collect.HashMultimap
-import com.google.common.collect.Multimaps
 import video.api.client.api.ApiClient
 import video.api.client.api.R
 import video.api.client.api.clients.VideosApi
@@ -21,6 +19,8 @@ import video.api.client.api.models.Environment
 import video.api.client.api.models.Video
 import video.api.client.api.upload.IProgressiveUploadSession
 import java.io.File
+import java.util.*
+import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.Executors
 import java.util.concurrent.Future
 
@@ -53,36 +53,35 @@ open class UploadService(
     @DrawableRes protected val notificationIconResourceId: Int = R.drawable.ic_api_video_logo,
     @ColorRes protected val notificationColorResourceId: Int = R.color.primary_orange
 ) : Service() {
-    private val uploadTasksMap =
-        Multimaps.synchronizedMultimap<String, Future<Video>>(HashMultimap.create())
+    private val uploadFuturesMap = ConcurrentHashMap<String, Future<Video>>()
     private val binder = UploadServiceBinder()
     private lateinit var videosApi: VideosApi
 
     private val executor = Executors.newSingleThreadExecutor()
     private val listener = object : UploadServiceListener {
-        override fun onUploadStarted(videoIdOrToken: String) {
+        override fun onUploadStarted(id: String) {
             onUploadStartedNotification(
-                videoIdOrToken,
+                id,
             )?.let {
                 notify(it)
             }
-            listeners.forEach { it.onUploadStarted(videoIdOrToken) }
+            listeners.forEach { it.onUploadStarted(id) }
         }
 
-        override fun onUploadProgress(videoIdOrToken: String, progress: Int) {
+        override fun onUploadProgress(id: String, progress: Int) {
             onUploadProgressNotification(
-                videoIdOrToken,
+                id,
                 progress
             )?.let {
                 notify(it)
             }
-            listeners.forEach { it.onUploadProgress(videoIdOrToken, progress) }
+            listeners.forEach { it.onUploadProgress(id, progress) }
         }
 
-        override fun onUploadError(videoIdOrToken: String, e: Exception) {
+        override fun onUploadError(id: String, e: Exception) {
             _numOfError++
-            onUploadErrorNotification(videoIdOrToken, e)?.let { notify(it) }
-            listeners.forEach { it.onUploadError(videoIdOrToken, e) }
+            onUploadErrorNotification(id, e)?.let { notify(it) }
+            listeners.forEach { it.onUploadError(id, e) }
 
             if (!hasRemaining) {
                 onLastUploadNotification()?.let { notify(it) }
@@ -90,9 +89,9 @@ open class UploadService(
             }
         }
 
-        override fun onUploadCancelled(videoIdOrToken: String) {
-            onUploadCancelledNotification(videoIdOrToken)?.let { notify(it) }
-            listeners.forEach { it.onUploadCancelled(videoIdOrToken) }
+        override fun onUploadCancelled(id: String) {
+            onUploadCancelledNotification(id)?.let { notify(it) }
+            listeners.forEach { it.onUploadCancelled(id) }
 
             if (!hasRemaining) {
                 onLastUploadNotification()?.let { notify(it) }
@@ -168,15 +167,15 @@ open class UploadService(
     /**
      * Cancel a specific upload
      *
-     * @param videoIdOrToken The video id or token of the upload to cancel
+     * @param id The unique upload id of the upload to cancel
      */
-    fun cancel(videoIdOrToken: String) {
-        uploadTasksMap[videoIdOrToken].let { set ->
-            set.forEach { future ->
-                _numOfCancelled++
-                future.cancel(true)
-            }
-        }
+    fun cancel(id: String) {
+        val future = uploadFuturesMap[id]
+
+        future?.let {
+            _numOfCancelled++
+            it.cancel(true)
+        } ?: throw NoSuchElementException("Failed to find upload id $id")
     }
 
     /**
@@ -185,8 +184,8 @@ open class UploadService(
      * Also clean counter and flush internal list
      */
     fun cancelAll() {
-        uploadTasksMap.keySet().forEach { cancel(it) }
-        uploadTasksMap.clear()
+        uploadFuturesMap.keys.forEach { cancel(it) }
+        uploadFuturesMap.clear()
 
         _numOfUploaded = 0
         _numOfError = 0
@@ -207,11 +206,11 @@ open class UploadService(
      *
      * You can customize the notification by overriding this method.
      *
-     * @param videoIdOrToken The video id or the token of the video
+     * @param id The video id or the token of the video
      * @param e The exception that has been throwned
      * @return The notification to be displayed or null
      */
-    open fun onUploadErrorNotification(videoIdOrToken: String, e: Exception): Notification? {
+    open fun onUploadErrorNotification(id: String, e: Exception): Notification? {
         return NotificationCompat.Builder(this, channelId)
             .setStyle(notificationIconResourceId, notificationColorResourceId)
             .setContentTitle(getString(R.string.notification_error_title))
@@ -224,11 +223,11 @@ open class UploadService(
      *
      * You can customize the notification by overriding this method.
      *
-     * @param videoIdOrToken The video id or the token of the video
+     * @param id The video id or the token of the video
      * @param progress The progress of the upload
      * @return The notification to be displayed or null
      */
-    open fun onUploadProgressNotification(videoIdOrToken: String, progress: Int): Notification? {
+    open fun onUploadProgressNotification(id: String, progress: Int): Notification? {
         return NotificationCompat.Builder(this, channelId)
             .setStyle(notificationIconResourceId, notificationColorResourceId)
             .setOngoing(true)
@@ -249,20 +248,20 @@ open class UploadService(
      *
      * You can customize the notification by overriding this method.
      *
-     * @param videoIdOrToken The video id or the token of the video
+     * @param id The video id or the token of the video
      * @return The notification to be displayed or null
      */
-    open fun onUploadStartedNotification(videoIdOrToken: String): Notification? = null
+    open fun onUploadStartedNotification(id: String): Notification? = null
 
     /**
      * Called when the upload of the file has been cancelled
      *
      * You can customize the notification by overriding this method.
      *
-     * @param videoIdOrToken The video id or the token of the video
+     * @param id The video id or the token of the video
      * @return The notification to be displayed or null
      */
-    open fun onUploadCancelledNotification(videoIdOrToken: String): Notification? = null
+    open fun onUploadCancelledNotification(id: String): Notification? = null
 
     /**
      * Called when the a file was successfully uploaded
@@ -287,107 +286,100 @@ open class UploadService(
      *
      * @param videoId The video id or the token of the video
      * @param filePath The path of the file to upload
+     * @return the unique upload id
      */
-    fun upload(videoId: String, filePath: String) {
+    fun upload(videoId: String, filePath: String) =
         upload(videoId, File(filePath))
-    }
+
 
     /**
      * Upload a file from its video id
      *
      * @param videoId The video id or the token of the video
      * @param file The file to upload
+     * @return the unique upload id
      */
-    fun upload(videoId: String, file: File) {
-        if (uploadTasksMap.containsKey(videoId)) {
-            cancel(videoId)
-            uploadTasksMap.removeAll(videoId)
-        } else {
-            _totalNumOfUploads++
-        }
+    fun upload(videoId: String, file: File): String {
+        _totalNumOfUploads++
 
-        uploadTasksMap.put(
-            videoId, executor.submit(
-                UploadTask(
-                    videoId,
-                    file,
-                    { videoIdOrToken, fileToUpload, progressListener ->
-                        videosApi.upload(
-                            videoIdOrToken,
-                            fileToUpload,
-                            progressListener
-                        )
-                    },
-                    listener
-                )
+        val id = UUID.randomUUID().toString()
+        val future = executor.submit(
+            UploadTask(
+                id,
+                file,
+                { fileToUpload, progressListener ->
+                    videosApi.upload(
+                        videoId,
+                        fileToUpload,
+                        progressListener
+                    )
+                },
+                listener
             )
         )
+
+        uploadFuturesMap[id] = future
+        return id
     }
 
     /**
      * Upload a file from its upload token
      *
-     * @param videoId The video id or the token of the video
+     * @param token The video id or the token of the video
      * @param filePath The path of the file to upload
+     * @return the unique upload id
      */
-    fun uploadWithUploadToken(token: String, filePath: String) {
+    fun uploadWithUploadToken(token: String, filePath: String) =
         uploadWithUploadToken(token, File(filePath))
-    }
 
     /**
      * Upload a file from its upload token
      *
-     * @param videoId The video id or the token of the video
+     * @param token The video id or the token of the video
      * @param file The file to upload
+     * @return the unique upload id
      */
-    fun uploadWithUploadToken(token: String, file: File) {
-        if (uploadTasksMap.containsKey(token)) {
-            cancel(token)
-            uploadTasksMap.removeAll(token)
-        } else {
-            _totalNumOfUploads++
-        }
+    fun uploadWithUploadToken(token: String, file: File): String {
+        _totalNumOfUploads++
 
-        uploadTasksMap.put(
-            token, executor.submit(
-                UploadTask(
-                    token,
-                    file,
-                    { videoIdOrToken, fileToUpload, progressListener ->
-                        videosApi.uploadWithUploadToken(
-                            videoIdOrToken,
-                            fileToUpload,
-                            progressListener
-                        )
-                    },
-                    listener
-                )
+        val id = UUID.randomUUID().toString()
+        val future = executor.submit(
+            UploadTask(
+                id,
+                file,
+                { fileToUpload, progressListener ->
+                    videosApi.uploadWithUploadToken(
+                        token,
+                        fileToUpload,
+                        progressListener
+                    )
+                },
+                listener
             )
         )
+
+        uploadFuturesMap[id] = future
+        return id
     }
 
     /**
      * Creates a [ProgressiveUploadSession].
      *
      * @param session The progressive upload session either for upload token or video id
-     * @param videoIdOrToken The video id or token
      */
     fun createProgressiveUploadSession(
-        session: IProgressiveUploadSession,
-        videoIdOrToken: String
+        session: IProgressiveUploadSession
     ): ProgressiveUploadSession {
-        return ProgressiveUploadSession(session, videoIdOrToken)
+        return ProgressiveUploadSession(session)
     }
 
     /**
      * A decorator for progression upload session.
      *
      * @param session The progressive upload session either for upload token or video id
-     * @param videoIdOrToken The video id or token
      */
     inner class ProgressiveUploadSession(
-        private val session: IProgressiveUploadSession,
-        private val videoIdOrToken: String
+        private val session: IProgressiveUploadSession
     ) {
         /**
          * Upload a single part (not the last).
@@ -402,30 +394,32 @@ open class UploadService(
          *
          * @param file The file to upload
          */
-        fun uploadPart(file: File) {
+        fun uploadPart(file: File): String {
             _totalNumOfUploads++
 
-            uploadTasksMap.put(
-                videoIdOrToken, executor.submit(
-                    UploadTask(
-                        videoIdOrToken,
-                        file,
-                        { _, fileToUpload, progressListener ->
-                            session.uploadPart(
-                                fileToUpload
-                            ) { bytesWritten, totalBytes ->
-                                progressListener.onProgress(
-                                    bytesWritten,
-                                    totalBytes,
-                                    0,
-                                    0
-                                )
-                            }
-                        },
-                        listener
-                    )
+            val id = UUID.randomUUID().toString()
+            val future = executor.submit(
+                UploadTask(
+                    id,
+                    file,
+                    { fileToUpload, progressListener ->
+                        session.uploadPart(
+                            fileToUpload
+                        ) { bytesWritten, totalBytes ->
+                            progressListener.onProgress(
+                                bytesWritten,
+                                totalBytes,
+                                0,
+                                0
+                            )
+                        }
+                    },
+                    listener
                 )
             )
+
+            uploadFuturesMap[id] = future
+            return id
         }
 
         /**
@@ -433,6 +427,7 @@ open class UploadService(
          *
          * @param filePath The path of the file to upload
          * @param partId The part id
+         * @return the unique upload id
          */
         fun uploadPart(filePath: String, partId: Int) =
             uploadPart(File(filePath), partId)
@@ -442,38 +437,42 @@ open class UploadService(
          *
          * @param file The file to upload
          * @param partId The part id
+         * @return the unique upload id
          */
-        fun uploadPart(file: File, partId: Int) {
+        fun uploadPart(file: File, partId: Int): String {
             _totalNumOfUploads++
 
-            uploadTasksMap.put(
-                videoIdOrToken, executor.submit(
-                    UploadTask(
-                        videoIdOrToken,
-                        file,
-                        { _, fileToUpload, progressListener ->
-                            session.uploadPart(
-                                fileToUpload,
-                                partId
-                            ) { bytesWritten, totalBytes ->
-                                progressListener.onProgress(
-                                    bytesWritten,
-                                    totalBytes,
-                                    0,
-                                    0
-                                )
-                            }
-                        },
-                        listener
-                    )
+            val id = UUID.randomUUID().toString()
+            val future = executor.submit(
+                UploadTask(
+                    id,
+                    file,
+                    { fileToUpload, progressListener ->
+                        session.uploadPart(
+                            fileToUpload,
+                            partId
+                        ) { bytesWritten, totalBytes ->
+                            progressListener.onProgress(
+                                bytesWritten,
+                                totalBytes,
+                                0,
+                                0
+                            )
+                        }
+                    },
+                    listener
                 )
             )
+
+            uploadFuturesMap[id] = future
+            return id
         }
 
         /**
          * Upload the last part.
          *
          * @param filePath The path of the file to upload
+         * @return the unique upload id
          */
         fun uploadLastPart(filePath: String) =
             uploadLastPart(File(filePath))
@@ -482,31 +481,34 @@ open class UploadService(
          * Upload the last part.
          *
          * @param file The file to upload
+         * @return the unique upload id
          */
-        fun uploadLastPart(file: File) {
+        fun uploadLastPart(file: File): String {
             _totalNumOfUploads++
 
-            uploadTasksMap.put(
-                videoIdOrToken, executor.submit(
-                    UploadTask(
-                        videoIdOrToken,
-                        file,
-                        { _, fileToUpload, progressListener ->
-                            session.uploadLastPart(
-                                fileToUpload
-                            ) { bytesWritten, totalBytes ->
-                                progressListener.onProgress(
-                                    bytesWritten,
-                                    totalBytes,
-                                    0,
-                                    0
-                                )
-                            }
-                        },
-                        listener
-                    )
+            val id = UUID.randomUUID().toString()
+            val future = executor.submit(
+                UploadTask(
+                    id,
+                    file,
+                    { fileToUpload, progressListener ->
+                        session.uploadLastPart(
+                            fileToUpload
+                        ) { bytesWritten, totalBytes ->
+                            progressListener.onProgress(
+                                bytesWritten,
+                                totalBytes,
+                                0,
+                                0
+                            )
+                        }
+                    },
+                    listener
                 )
             )
+
+            uploadFuturesMap[id] = future
+            return id
         }
 
         /**
@@ -514,6 +516,7 @@ open class UploadService(
          *
          * @param filePath The path of the file to upload
          * @param partId The part id
+         * @return the unique upload id
          */
         fun uploadLastPart(filePath: String, partId: Int) =
             uploadLastPart(File(filePath), partId)
@@ -523,32 +526,35 @@ open class UploadService(
          *
          * @param file The file to upload
          * @param partId The part id
+         * @return the unique upload id
          */
-        fun uploadLastPart(file: File, partId: Int) {
+        fun uploadLastPart(file: File, partId: Int): String {
             _totalNumOfUploads++
 
-            uploadTasksMap.put(
-                videoIdOrToken, executor.submit(
-                    UploadTask(
-                        videoIdOrToken,
-                        file,
-                        { _, fileToUpload, progressListener ->
-                            session.uploadLastPart(
-                                fileToUpload,
-                                partId
-                            ) { bytesWritten, totalBytes ->
-                                progressListener.onProgress(
-                                    bytesWritten,
-                                    totalBytes,
-                                    0,
-                                    0
-                                )
-                            }
-                        },
-                        listener
-                    )
+            val id = UUID.randomUUID().toString()
+            val future = executor.submit(
+                UploadTask(
+                    id,
+                    file,
+                    { fileToUpload, progressListener ->
+                        session.uploadLastPart(
+                            fileToUpload,
+                            partId
+                        ) { bytesWritten, totalBytes ->
+                            progressListener.onProgress(
+                                bytesWritten,
+                                totalBytes,
+                                0,
+                                0
+                            )
+                        }
+                    },
+                    listener
                 )
             )
+
+            uploadFuturesMap[id] = future
+            return id
         }
     }
 
