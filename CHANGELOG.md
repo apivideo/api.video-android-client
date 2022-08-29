@@ -1,6 +1,9 @@
 # Changelog
 All changes to this project will be documented in this file.
 
+## [1.2.1] - 2022-08-30
+- Improve the upload Service
+
 ## [1.2.0] - 2022-08-22
 - Add an upload Service
 
