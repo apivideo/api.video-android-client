@@ -1,6 +1,9 @@
 # Changelog
 All changes to this project will be documented in this file.
 
+## [1.2.2] - 2022-09-13
+- period parameter is now mandatory in analytics endpoints
+
 ## [1.2.1] - 2022-08-30
 - Improve the upload Service
 
