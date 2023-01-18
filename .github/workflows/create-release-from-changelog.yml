@@ -5,6 +5,7 @@ on:
     paths:
       - 'CHANGELOG.md'
 
+
 jobs:
   update-documentation:
     runs-on: ubuntu-latest
@@ -15,4 +16,3 @@ jobs:
         with:
           github-auth-token: ${{ secrets.GITHUB_TOKEN }}
           prefix: v
-
