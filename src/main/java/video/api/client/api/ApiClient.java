@@ -160,6 +160,9 @@ public class ApiClient {
         setName("AV-Origin-Sdk", name, version);
     }
 
+    public boolean hasSdkName() {
+        return defaultHeaderMap.containsKey("AV-Origin-Sdk");
+    }
     public void setApplicationName(String name, String version) {
         setName("AV-Origin-App", name, version);
     }

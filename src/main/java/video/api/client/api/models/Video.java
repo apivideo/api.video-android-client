@@ -123,7 +123,7 @@ public class Video implements Serializable {
      * @return createdAt
      **/
     @javax.annotation.Nullable
-    @ApiModelProperty(value = "When a video was created, presented in ISO-8601 format.")
+    @ApiModelProperty(example = "2019-06-24T11:45:01.109Z", value = "When a video was created, presented in ISO-8601 format.")
 
     public OffsetDateTime getCreatedAt() {
         return createdAt;
