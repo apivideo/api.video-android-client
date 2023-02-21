@@ -14,6 +14,7 @@
     - [Gradle users](#gradle-users)
     - [Others](#others)
   - [Code sample](#code-sample)
+  - [Upload options](#upload-options)
   - [Permissions](#permissions)
 - [Documentation](#documentation)
   - [API Endpoints](#api-endpoints)
@@ -137,7 +138,14 @@ class MainActivity : AppCompatActivity() {
 
 ### Example
 
-An example that demonstrates how to use the API is provided in folder `example/`.
+Examples that demonstrate how to use the API is provided in folder `examples/`.
+
+## Upload options
+
+To upload a video, you have 3 differents options:
+* WorkManager: preferred option: Upload with Android WorkManager API. It supports progress notifications. Directly use, WorkManager extensions. See [example](examples/workmanager) for more details.
+* UploadService: Upload with an Android Service. It supports progress notifications. You have to extend the `UploadService` and register it in your `AndroidManifest.xml`. See [example](examples/service) for more details.
+* Direct call with `ApiClient`: Do not call API from the main thread, otherwise you will get a android.os.NetworkOnMainThreadException. Dispatch API calls with Thread, Executors or Kotlin coroutine to avoid this.
 
 ## Permissions
 
@@ -435,7 +443,7 @@ Method | HTTP request | Description
 ### API key
 
 Most endpoints required to be authenticated using the API key mechanism described in our [documentation](https://docs.api.video/reference#authentication).
-The access token generation mechanism is automatically handled by the client. All you have to do is provide an API key when instantiating the ApiVideoClient:
+The access token generation mechanism is automatically handled by the client. All you have to do is provide an API key when instantiating the `ApiVideoClient`:
 ```kotlin
 val client = ApiVideoClient("YOUR_API_KEY")
 ```
@@ -450,7 +458,7 @@ val client = ApiVideoClient()
 ## Recommendation
 
 It's recommended to create an instance of `ApiClient` per thread in a multithreaded environment to avoid any potential issues.
-Do not call API from the main thread, otherwise you will get a android.os.NetworkOnMainThreadException. Dispatch API calls with Thread, Executors or Kotlin coroutine to avoid this. Alternatively, APIs come with an asynchronous counterpart (`createAsync` for `create`) except the upload endpoint. In this case, you can use the customisable `UploadService` that manages background uploads and as well as notifications.
+For direct call with `ApiClient`: Do not call API from the main thread, otherwise you will get a `android.os.NetworkOnMainThreadException`. Dispatch API calls with Thread, Executors or Kotlin coroutine to avoid this. Alternatively, APIs come with an asynchronous counterpart (`createAsync` for `create`) except for the upload endpoint.
 
 ## Have you gotten use from this API client?
 

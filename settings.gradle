@@ -1,2 +1,3 @@
 rootProject.name = "android-api-client"
-include ":example"
+include ":examples:service"
+include ":examples:workmanager"
