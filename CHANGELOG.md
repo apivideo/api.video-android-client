@@ -1,6 +1,9 @@
 # Changelog
 All changes to this project will be documented in this file.
 
+## [1.3.0] - 2023-02-28
+- Introduce WorkManager dedicated API
+
 ## [1.2.3] - 2022-11-16
 - Fix the UploadService notification level
 - In example, add support for Android 13
