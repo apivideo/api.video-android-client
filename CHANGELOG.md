@@ -1,6 +1,11 @@
 # Changelog
 All changes to this project will be documented in this file.
 
+## [1.3.1] - 2023-04-04
+- Add custom tag for WorkManager
+- Fix tag for progressive upload in WorkManager
+- Worker now returns the file in case developer want to delete it after upload.
+
 ## [1.3.0] - 2023-02-28
 - Introduce WorkManager dedicated API
 
