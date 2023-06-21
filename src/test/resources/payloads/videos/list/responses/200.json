@@ -15,8 +15,8 @@
       "key" : "Format",
       "value" : "Tutorial"
     } ],
-    "publishedAt" : "2019-12-16T08:25:51+00:00",
-    "updatedAt" : "2019-12-16T08:48:49+00:00",
+    "publishedAt" : "2019-12-16T08:25:51.000Z",
+    "updatedAt" : "2019-12-16T08:48:49.000Z",
     "source" : {
       "uri" : "/videos/c188ed58-3403-46a2-b91b-44603d10b2c9/source"
     },
@@ -25,7 +25,7 @@
       "player" : "https://embed.api.video/vod/vi4blUQJFrYWbaG44NChkH27",
       "hls" : "https://cdn.api.video/vod/vi4blUQJFrYWbaG44NChkH27/hls/manifest.m3u8",
       "thumbnail" : "https://cdn.api.video/vod/vi4blUQJFrYWbaG44NChkH27/thumbnail.jpg",
-      "mp4" : "https://cdn.api.video/vod/vi4blUQJFrYWbaG44NChkH27/mp4/1080/source.mp4"
+      "mp4" : "https://cdn.api.video/vod/vi4blUQJFrYWbaG44NChkH27/mp4/source.mp4"
     }
   }, {
     "videoId" : "vi4blUQJFrYWbaG44NChkH27",
@@ -45,8 +45,8 @@
       "key" : "Technology",
       "value" : "Computers"
     } ],
-    "publishedAt" : "2019-12-16T08:25:51+00:00",
-    "updatedAt" : "2019-12-16T08:48:49+00:00",
+    "publishedAt" : "2019-12-16T08:25:51.000Z",
+    "updatedAt" : "2019-12-16T08:48:49.000Z",
     "source" : {
       "uri" : "/videos/vi4blUQJFrYWbaG44NChkH27/source"
     },
@@ -55,7 +55,7 @@
       "player" : "https://embed.api.video/vod/vi4blUQJFrYWbaG44NChkH27",
       "hls" : "https://cdn.api.video/vod/vi4blUQJFrYWbaG44NChkH27/hls/manifest.m3u8",
       "thumbnail" : "https://cdn.api.video/vod/vi4blUQJFrYWbaG44NChkH27/thumbnail.jpg",
-      "mp4" : "https://cdn.api.video/vod/vi4blUQJFrYWbaG44NChkH27/mp4/1080/source.mp4"
+      "mp4" : "https://cdn.api.video/vod/vi4blUQJFrYWbaG44NChkH27/mp4/source.mp4"
     }
   }, {
     "videoId" : "vi4blUQJFrYWbaG44NChkH27",
@@ -70,8 +70,8 @@
       "key" : "Length",
       "value" : "Short"
     } ],
-    "publishedAt" : "2019-12-16T08:25:51+00:00",
-    "updatedAt" : "2019-12-16T08:48:49+00:00",
+    "publishedAt" : "2019-12-16T08:25:51.000Z",
+    "updatedAt" : "2019-12-16T08:48:49.000Z",
     "source" : {
       "uri" : "/videos/vi4blUQJFrYWbaG44NChkH27/source"
     },
@@ -80,7 +80,7 @@
       "player" : "https://embed.api.video/vod/vi4blUQJFrYWbaG44NChkH27",
       "hls" : "https://cdn.api.video/vod/vi4blUQJFrYWbaG44NChkH27/hls/manifest.m3u8",
       "thumbnail" : "https://cdn.api.video/vod/vi4blUQJFrYWbaG44NChkH27/thumbnail.jpg",
-      "mp4" : "https://cdn.api.video/vod/vi4blUQJFrYWbaG44NChkH27/mp4/1080/source.mp4"
+      "mp4" : "https://cdn.api.video/vod/vi4blUQJFrYWbaG44NChkH27/mp4/source.mp4"
     }
   } ],
   "pagination" : {
