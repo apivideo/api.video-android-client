@@ -103,7 +103,7 @@ public class VideosApiTest extends AbstractApiTest {
                     .iframe("<iframe src=\"https://embed.api.video/vod/vi4blUQJFrYWbaG44NChkH27\" width=\"100%\" height=\"100%\" frameborder=\"0\" scrolling=\"no\" allowfullscreen=\"\"></iframe>")
                     .player(URI.create("https://embed.api.video/vod/vi4blUQJFrYWbaG44NChkH27"))
                     .thumbnail(URI.create("https://cdn.api.video/vod/vi4blUQJFrYWbaG44NChkH27/thumbnail.jpg"))
-                    .mp4(URI.create("https://cdn.api.video/vod/vi4blUQJFrYWbaG44NChkH27/mp4/1080/source.mp4")));
+                    .mp4(URI.create("https://cdn.api.video/vod/vi4blUQJFrYWbaG44NChkH27/mp4/source.mp4")));
         }
 
         @Test
@@ -162,7 +162,7 @@ public class VideosApiTest extends AbstractApiTest {
                     .iframe("<iframe src=\"https://embed.api.video/vod/vi4blUQJFrYWbaG44NChkH27\" width=\"100%\" height=\"100%\" frameborder=\"0\" scrolling=\"no\" allowfullscreen=\"\"></iframe>")
                     .player(URI.create("https://embed.api.video/vod/vi4blUQJFrYWbaG44NChkH27"))
                     .thumbnail(URI.create("https://cdn.api.video/vod/vi4blUQJFrYWbaG44NChkH27/thumbnail.jpg"))
-                    .mp4(URI.create("https://cdn.api.video/vod/vi4blUQJFrYWbaG44NChkH27/mp4/1080/source.mp4")));
+                    .mp4(URI.create("https://cdn.api.video/vod/vi4blUQJFrYWbaG44NChkH27/mp4/source.mp4")));
         }
     }
 
@@ -265,7 +265,7 @@ public class VideosApiTest extends AbstractApiTest {
                     .iframe("<iframe src=\"https://embed.api.video/vod/vi4blUQJFrYWbaG44NChkH27\" width=\"100%\" height=\"100%\" frameborder=\"0\" scrolling=\"no\" allowfullscreen=\"\"></iframe>")
                     .player(URI.create("https://embed.api.video/vod/vi4blUQJFrYWbaG44NChkH27"))
                     .thumbnail(URI.create("https://cdn.api.video/vod/vi4blUQJFrYWbaG44NChkH27/thumbnail.jpg"))
-                    .mp4(URI.create("https://cdn.api.video/vod/vi4blUQJFrYWbaG44NChkH27/mp4/1080/source.mp4")));
+                    .mp4(URI.create("https://cdn.api.video/vod/vi4blUQJFrYWbaG44NChkH27/mp4/source.mp4")));
 
         }
 
@@ -325,7 +325,7 @@ public class VideosApiTest extends AbstractApiTest {
                     .iframe("<iframe src=\"https://embed.api.video/vod/vi4blUQJFrYWbaG44NChkH27\" width=\"100%\" height=\"100%\" frameborder=\"0\" scrolling=\"no\" allowfullscreen=\"\"></iframe>")
                     .player(URI.create("https://embed.api.video/vod/vi4blUQJFrYWbaG44NChkH27"))
                     .thumbnail(URI.create("https://cdn.api.video/vod/vi4blUQJFrYWbaG44NChkH27/thumbnail.jpg"))
-                    .mp4(URI.create("https://cdn.api.video/vod/vi4blUQJFrYWbaG44NChkH27/mp4/1080/source.mp4")));
+                    .mp4(URI.create("https://cdn.api.video/vod/vi4blUQJFrYWbaG44NChkH27/mp4/source.mp4")));
         }
 
         @Test
@@ -404,7 +404,7 @@ public class VideosApiTest extends AbstractApiTest {
                     .iframe("<iframe src=\"https://embed.api.video/vod/vi4blUQJFrYWbaG44NChkH27\" width=\"100%\" height=\"100%\" frameborder=\"0\" scrolling=\"no\" allowfullscreen=\"\"></iframe>")
                     .player(URI.create("https://embed.api.video/vod/vi4blUQJFrYWbaG44NChkH27"))
                     .thumbnail(URI.create("https://cdn.api.video/vod/vi4blUQJFrYWbaG44NChkH27/thumbnail.jpg"))
-                    .mp4(URI.create("https://cdn.api.video/vod/vi4blUQJFrYWbaG44NChkH27/mp4/1080/source.mp4")));
+                    .mp4(URI.create("https://cdn.api.video/vod/vi4blUQJFrYWbaG44NChkH27/mp4/source.mp4")));
         }
 
         @Test
@@ -465,7 +465,7 @@ public class VideosApiTest extends AbstractApiTest {
                     .iframe("<iframe src=\"https://embed.api.video/vod/vi4blUQJFrYWbaG44NChkH27\" width=\"100%\" height=\"100%\" frameborder=\"0\" scrolling=\"no\" allowfullscreen=\"\"></iframe>")
                     .player(URI.create("https://embed.api.video/vod/vi4blUQJFrYWbaG44NChkH27"))
                     .thumbnail(URI.create("https://cdn.api.video/vod/vi4blUQJFrYWbaG44NChkH27/thumbnail.jpg"))
-                    .mp4(URI.create("https://cdn.api.video/vod/vi4blUQJFrYWbaG44NChkH27/mp4/1080/source.mp4")));
+                    .mp4(URI.create("https://cdn.api.video/vod/vi4blUQJFrYWbaG44NChkH27/mp4/source.mp4")));
         }
 
         @Test
@@ -524,7 +524,7 @@ public class VideosApiTest extends AbstractApiTest {
                     .iframe("<iframe src=\"https://embed.api.video/vod/vi4blUQJFrYWbaG44NChkH27\" width=\"100%\" height=\"100%\" frameborder=\"0\" scrolling=\"no\" allowfullscreen=\"\"></iframe>")
                     .player(URI.create("https://embed.api.video/vod/vi4blUQJFrYWbaG44NChkH27"))
                     .thumbnail(URI.create("https://cdn.api.video/vod/vi4blUQJFrYWbaG44NChkH27/thumbnail.jpg"))
-                    .mp4(URI.create("https://cdn.api.video/vod/vi4blUQJFrYWbaG44NChkH27/mp4/1080/source.mp4")));
+                    .mp4(URI.create("https://cdn.api.video/vod/vi4blUQJFrYWbaG44NChkH27/mp4/source.mp4")));
 
         }
 
@@ -597,7 +597,7 @@ public class VideosApiTest extends AbstractApiTest {
                     .iframe("<iframe src=\"https://embed.api.video/vod/vi4blUQJFrYWbaG44NChkH27\" width=\"100%\" height=\"100%\" frameborder=\"0\" scrolling=\"no\" allowfullscreen=\"\"></iframe>")
                     .player(URI.create("https://embed.api.video/vod/vi4blUQJFrYWbaG44NChkH27"))
                     .thumbnail(URI.create("https://cdn.api.video/vod/vi4blUQJFrYWbaG44NChkH27/thumbnail.jpg"))
-                    .mp4(URI.create("https://cdn.api.video/vod/vi4blUQJFrYWbaG44NChkH27/mp4/1080/source.mp4")));
+                    .mp4(URI.create("https://cdn.api.video/vod/vi4blUQJFrYWbaG44NChkH27/mp4/source.mp4")));
         }
 
         @Test
