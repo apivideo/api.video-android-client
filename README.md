@@ -18,6 +18,7 @@
   - [Permissions](#permissions)
 - [Documentation](#documentation)
   - [API Endpoints](#api-endpoints)
+    - [AnalyticsApi](#analyticsapi)
     - [CaptionsApi](#captionsapi)
     - [ChaptersApi](#chaptersapi)
     - [LiveStreamsApi](#livestreamsapi)
@@ -57,7 +58,7 @@ Add this dependency to your project's POM:
 <dependency>
   <groupId>video.api</groupId>
   <artifactId>android-api-client</artifactId>
-  <version>1.3.2</version>
+  <version>1.4.0</version>
   <scope>compile</scope>
 </dependency>
 ```
@@ -67,7 +68,7 @@ Add this dependency to your project's POM:
 Add this dependency to your project's build file:
 
 ```groovy
-implementation "video.api:android-api-client:1.3.2"
+implementation "video.api:android-api-client:1.4.0"
 ```
 
 ### Others
@@ -80,7 +81,7 @@ mvn clean package
 
 Then manually install the following JARs:
 
-* `target/android-api-client-1.3.2.jar`
+* `target/android-api-client-1.4.0.jar`
 * `target/lib/*.jar`
 
 ## Code sample
@@ -164,6 +165,25 @@ Your application also has to dynamically request the `android.permission.READ_EX
 ## API Endpoints
 
 All URIs are relative to *https://ws.api.video*
+
+
+### AnalyticsApi
+
+
+#### Retrieve an instance of AnalyticsApi:
+```kotlin
+val client = ApiVideoClient("YOUR_API_KEY")
+val analytics = client.analytics()
+```
+
+
+
+#### Endpoints
+
+Method | HTTP request | Description
+------------- | ------------- | -------------
+[**getLiveStreamsPlays**](docs/AnalyticsApi.md#getLiveStreamsPlays) | **GET** /analytics/live-streams/plays | Get play events for live stream
+[**getVideosPlays**](docs/AnalyticsApi.md#getVideosPlays) | **GET** /analytics/videos/plays | Get play events for video
 
 
 ### CaptionsApi
@@ -371,6 +391,9 @@ Method | HTTP request | Description
 
  - [AccessToken](docs/AccessToken.md)
  - [AdditionalBadRequestErrors](docs/AdditionalBadRequestErrors.md)
+ - [AnalyticsData](docs/AnalyticsData.md)
+ - [AnalyticsPlays400Error](docs/AnalyticsPlays400Error.md)
+ - [AnalyticsPlaysResponse](docs/AnalyticsPlaysResponse.md)
  - [AuthenticatePayload](docs/AuthenticatePayload.md)
  - [BadRequest](docs/BadRequest.md)
  - [BytesRange](docs/BytesRange.md)
