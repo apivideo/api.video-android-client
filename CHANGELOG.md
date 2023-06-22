@@ -1,6 +1,9 @@
 # Changelog
 All changes to this project will be documented in this file.
 
+## [1.4.0] - 2023-06-19
+- Introducing new analytics endpoints
+
 ## [1.3.2] - 2023-04-20
 - Add upload token and videoId in WorkManager tags
 
