@@ -90,48 +90,30 @@ Please follow the [installation](#installation) instruction and execute the foll
 
 ```kotlin
 
-import android.os.Bundle
-import android.util.Log
-import androidx.appcompat.app.AppCompatActivity
-import video.api.client.ApiVideoClient
-import video.api.client.api.ApiException
-import video.api.client.api.models.*
-import java.io.File
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
+val apiVideoClient = ApiVideoClient("YOUR_API_KEY")
+// if you rather like to use the sandbox environment:
+// val apiVideoClient = ApiVideoClient("YOU_SANDBOX_API_KEY", Environment.SANDBOX)
 
-class MainActivity : AppCompatActivity() {
-    private val executor: ExecutorService = Executors.newSingleThreadExecutor()
+/**
+ * This example uses an Android specific API called WorkManager to dispatch upload.
+ * We initialize it before using it.
+ */
+VideosApiStore.initialize(apiVideoClient.videos())
+val workManager = WorkManager.getInstance(context) // WorkManager comes from package "androidx.work:work-runtime"
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-    }
+val myVideoFile = File("my-video.mp4")
 
-    override fun onResume() {
-        super.onResume()
-
-        val apiVideoClient = ApiVideoClient("YOUR_API_KEY")
-        // if you rather like to use the sandbox environment:
-        // val apiVideoClient = ApiVideoClient("YOU_SANDBOX_API_KEY", Environment.SANDBOX)
-
-        val myVideoFile = File("my-video.mp4")
-
-        /**
-         * Notice: you must not call API from the UI/main thread. Dispatch with Thread, Executors or Kotlin coroutines.
-         */
-        executor.execute {
-            try {
-                var video = apiVideoClient.videos().create(VideoCreationPayload().title("my video"))
-                video = apiVideoClient.videos().upload(video.videoId, myVideoFile)
-                Log.i("Example", "$video")
-            } catch (e: ApiException) {
-                Log.e("Example", "Exception when calling VideoApi")
-                e.message?.let {
-                    Log.e("Example", "Reason: ${it}")
-                }
-            }
-        }
+/**
+ * You must not call API from the UI/main thread on Android. Dispatch with Thread, Executors, 
+ * Kotlin coroutines or asynchroneous API (such as `createAsync` instead of `create`).
+ */
+executor.execute {
+    try {
+        val video = apiVideoClient.videos().create(VideoCreationPayload().title("my video"))
+        Log.i("Example", "Video created: $video")
+        workManager.upload(video.videoId, myVideoFile)
+    } catch (e: ApiException) {
+        Log.e("Example", "Exception when calling VideoApi", e)
     }
 }
 
@@ -141,11 +123,11 @@ class MainActivity : AppCompatActivity() {
 
 Examples that demonstrate how to use the API is provided in folder `examples/`.
 
-## Upload options
+## Upload methods
 
-To upload a video, you have 3 differents options:
-* WorkManager: preferred option: Upload with Android WorkManager API. It supports progress notifications. Directly use, WorkManager extensions. See [example](examples/workmanager) for more details.
-* UploadService: Upload with an Android Service. It supports progress notifications. You have to extend the `UploadService` and register it in your `AndroidManifest.xml`. See [example](examples/service) for more details.
+To upload a video, you have 3 differents methods:
+* `WorkManager`: preferred method: Upload with Android WorkManager API. It supports progress notifications. Directly use, WorkManager extensions. See [example](examples/workmanager) for more details.
+* `UploadService`: Upload with an Android Service. It supports progress notifications. You have to extend the `UploadService` and register it in your `AndroidManifest.xml`. See [example](examples/service) for more details.
 * Direct call with `ApiClient`: Do not call API from the main thread, otherwise you will get a android.os.NetworkOnMainThreadException. Dispatch API calls with Thread, Executors or Kotlin coroutine to avoid this.
 
 ## Permissions
