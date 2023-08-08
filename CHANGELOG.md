@@ -1,6 +1,9 @@
 # Changelog
 All changes to this project will be documented in this file.
 
+## [1.4.1] - 2023-08-08
+- Fix upload notification resources name
+
 ## [1.4.0] - 2023-06-28
 - Introducing new live streams restream feature
 - Introducing new analytics endpoints
