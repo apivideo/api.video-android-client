@@ -1,6 +1,9 @@
 # Changelog
 All changes to this project will be documented in this file.
 
+## [1.5.0] - 2023-08-21
+- Improve cancel of upload workers for the WorkManager API
+
 ## [1.4.2] - 2023-08-10
 - Fix upload with upload token and video id when video is smaller than chunk size
 
