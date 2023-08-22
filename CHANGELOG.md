@@ -1,6 +1,9 @@
 # Changelog
 All changes to this project will be documented in this file.
 
+## [1.5.1] - 2023-08-22
+- Fix cancellation of upload workers for the WorkManager API
+
 ## [1.5.0] - 2023-08-21
 - Improve cancel of upload workers for the WorkManager API
 
