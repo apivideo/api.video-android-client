@@ -58,7 +58,7 @@ Add this dependency to your project's POM:
 <dependency>
   <groupId>video.api</groupId>
   <artifactId>android-api-client</artifactId>
-  <version>1.5.0</version>
+  <version>1.5.1</version>
   <scope>compile</scope>
 </dependency>
 ```
@@ -68,7 +68,7 @@ Add this dependency to your project's POM:
 Add this dependency to your project's build file:
 
 ```groovy
-implementation "video.api:android-api-client:1.5.0"
+implementation "video.api:android-api-client:1.5.1"
 ```
 
 ### Others
@@ -81,7 +81,7 @@ mvn clean package
 
 Then manually install the following JARs:
 
-* `target/android-api-client-1.5.0.jar`
+* `target/android-api-client-1.5.1.jar`
 * `target/lib/*.jar`
 
 ## Code sample
