@@ -14,6 +14,7 @@ import video.api.client.api.work.stores.NotificationConfigurationStore
 import video.api.client.api.work.stores.NotificationConfigurationStore.channelId
 import video.api.client.api.work.stores.NotificationConfigurationStore.notificationColorResourceId
 import video.api.client.api.work.stores.NotificationConfigurationStore.notificationIconResourceId
+import java.util.concurrent.Executors
 
 /**
  * Worker that uploads a video to api.video.
@@ -146,7 +147,9 @@ abstract class AbstractUploadWorker(
         const val ERROR_KEY = "error"
         const val FILE_PATH_KEY = "filePath"
 
-        @OptIn(ExperimentalCoroutinesApi::class)
-        internal val limitedCoroutineContext = Dispatchers.IO.limitedParallelism(1)
+        /**
+         * A single thread executor to be used for upload to avoid parallel uploads.
+         */
+        internal val uploaderExecutor = Executors.newSingleThreadExecutor()
     }
 }
