@@ -1,6 +1,9 @@
 # Changelog
 All changes to this project will be documented in this file.
 
+## [1.5.2] - 2023-09-26
+- Extend Android minSdkVersion to 21
+
 ## [1.5.1] - 2023-08-22
 - Fix cancellation of upload workers for the WorkManager API
 

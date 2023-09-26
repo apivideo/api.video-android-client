@@ -5,7 +5,7 @@ apply plugin: 'maven-publish'
 apply plugin: 'kotlin-android'
 
 group = 'video.api'
-version = '1.5.1'
+version = '1.5.2'
 
 buildscript {
     repositories {
@@ -36,7 +36,7 @@ if(hasProperty('target') && target == 'android') {
         compileSdkVersion 33
         buildToolsVersion '30.0.3'
         defaultConfig {
-            minSdkVersion 24
+            minSdkVersion 21
             targetSdkVersion 33
             multiDexEnabled true
 
