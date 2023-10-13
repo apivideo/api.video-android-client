@@ -7,7 +7,7 @@
     <name>${project.groupId}:${project.artifactId}</name>
     <version>1.5.2</version>
     <url>https://github.com/apivideo/api.video-android-client</url>
-    <description>api.video Android API client</description>
+    <description>The official Android api.video client</description>
     <scm>
         <connection>scm:git:git://github.com/apivideo/api.video-android-client.git</connection>
         <developerConnection>scm:git:ssh://github.com:apivideo/api.video-android-client.git</developerConnection>
