@@ -88,34 +88,15 @@ Then manually install the following JARs:
 Please follow the [installation](#installation) instruction and execute the following Kotlin code:
 
 ```kotlin
-
-val apiVideoClient = ApiVideoClient("YOUR_API_KEY")
+// If you want to upload a video with an upload token (uploadWithUploadToken):
+VideosApiStore.initialize()
 // if you rather like to use the sandbox environment:
-// val apiVideoClient = ApiVideoClient("YOU_SANDBOX_API_KEY", Environment.SANDBOX)
-
-/**
- * This example uses an Android specific API called WorkManager to dispatch upload.
- * We initialize it before using it.
- */
-VideosApiStore.initialize(apiVideoClient.videos())
-val workManager = WorkManager.getInstance(context) // WorkManager comes from package "androidx.work:work-runtime"
+// VideosApiStore.initialize(environment = Environment.SANDBOX)
 
 val myVideoFile = File("my-video.mp4")
 
-/**
- * You must not call API from the UI/main thread on Android. Dispatch with Thread, Executors, 
- * Kotlin coroutines or asynchroneous API (such as `createAsync` instead of `create`).
- */
-executor.execute {
-    try {
-        val video = apiVideoClient.videos().create(VideoCreationPayload().title("my video"))
-        Log.i("Example", "Video created: $video")
-        workManager.upload(video.videoId, myVideoFile)
-    } catch (e: ApiException) {
-        Log.e("Example", "Exception when calling VideoApi", e)
-    }
-}
-
+val workManager = WorkManager.getInstance(context) // WorkManager comes from package "androidx.work:work-runtime"
+workManager.uploadWithUploadToken("MY_UPLOAD_TOKEN", myVideoFile) // Dispatch the upload with the WorkManager
 ```
 
 ### Example
@@ -125,9 +106,9 @@ Examples that demonstrate how to use the API is provided in folder `examples/`.
 ## Upload methods
 
 To upload a video, you have 3 differents methods:
-* `WorkManager`: preferred method: Upload with Android WorkManager API. It supports progress notifications. Directly use, WorkManager extensions. See [example](examples/workmanager) for more details.
-* `UploadService`: Upload with an Android Service. It supports progress notifications. You have to extend the `UploadService` and register it in your `AndroidManifest.xml`. See [example](examples/service) for more details.
-* Direct call with `ApiClient`: Do not call API from the main thread, otherwise you will get a android.os.NetworkOnMainThreadException. Dispatch API calls with Thread, Executors or Kotlin coroutine to avoid this.
+* `WorkManager`: preferred method: Upload with Android WorkManager API. It supports progress notifications, upload in background, queue, reupload after lost connections. Directly use, WorkManager extensions. See [example](examples/workmanager) for more details.
+* `UploadService`: Upload with an Android Service. It supports progress notifications, upload in background, queue. You have to extend the `UploadService` and register it in your `AndroidManifest.xml`. See [example](examples/service) for more details.
+* Direct call with `ApiClient`: Do not call API from the main thread, otherwise you will get an `android.os.NetworkOnMainThreadException`. Dispatch API calls with Thread, Executors or Kotlin coroutine to avoid this.
 
 ## Permissions
 
@@ -428,10 +409,11 @@ Method | HTTP request | Description
 ### API key
 
 Most endpoints required to be authenticated using the API key mechanism described in our [documentation](https://docs.api.video/reference#authentication).
-The access token generation mechanism is automatically handled by the client. All you have to do is provide an API key when instantiating the `ApiVideoClient`:
-```kotlin
-val client = ApiVideoClient("YOUR_API_KEY")
-```
+
+On Android, you must NOT store your API key in your application code to prevent your API key from being exposed in your source code.
+Only the [Public endpoints](#public-endpoints) can be called without authentication.
+In the case, you want to call an endpoint that requires authentication, you will have to use a backend server. See [Security best practices](https://docs.api.video/sdks/security) for more details.
+
 
 ### Public endpoints
 
