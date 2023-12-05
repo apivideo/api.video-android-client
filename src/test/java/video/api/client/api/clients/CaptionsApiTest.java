@@ -89,12 +89,13 @@ public class CaptionsApiTest extends AbstractApiTest {
 
             assertThat(res.getItems()).hasSize(2);
 
-            assertThat(res.getItems())
-                    .containsExactlyElementsIn(Arrays.asList(
-                            new Caption().src("https://cdn.api.video/vod/vi3N6cDinStg3oBbN79GklWS/captions/en.vtt")
-                                    .uri("/videos/vi3N6cDinStg3oBbN79GklWS/captions/en").srclang("en")._default(false),
-                            new Caption().src("https://cdn.api.video/vod/vi3N6cDinStg3oBbN79GklWS/captions/fr.vtt")
-                                    .uri("/videos/vi3N6cDinStg3oBbN79GklWS/captions/fr").srclang("fr")._default(false)))
+            assertThat(res.getItems()).containsExactlyElementsIn(Arrays.asList(
+                    new Caption().src("https://cdn.api.video/vod/vi3N6cDinStg3oBbN79GklWS/captions/en.vtt")
+                            .uri("/videos/vi3N6cDinStg3oBbN79GklWS/captions/en").srclang("en").languageName("English")
+                            ._default(false),
+                    new Caption().src("https://cdn.api.video/vod/vi3N6cDinStg3oBbN79GklWS/captions/fr.vtt")
+                            .uri("/videos/vi3N6cDinStg3oBbN79GklWS/captions/fr").srclang("fr").languageName("Française")
+                            ._default(false)))
                     .inOrder();
         }
 
@@ -138,6 +139,7 @@ public class CaptionsApiTest extends AbstractApiTest {
             assertThat(res.getUri()).isEqualTo("/videos/vi3N6cDinStg3oBbN79GklWS/captions/en");
             assertThat(res.getSrc()).isEqualTo("https://cdn.api.video/vod/vi3N6cDinStg3oBbN79GklWS/captions/en.vtt");
             assertThat(res.getSrclang()).isEqualTo("en");
+            assertThat(res.getLanguageName()).isEqualTo("English");
             assertThat(res.getDefault()).isEqualTo(false);
         }
 
@@ -186,18 +188,19 @@ public class CaptionsApiTest extends AbstractApiTest {
             assertThat(res.getUri()).isEqualTo("/videos/vi3N6cDinStg3oBbN79GklWS/captions/en");
             assertThat(res.getSrc()).isEqualTo("https://cdn.api.video/vod/vi3N6cDinStg3oBbN79GklWS/captions/en.vtt");
             assertThat(res.getSrclang()).isEqualTo("en");
+            assertThat(res.getLanguageName()).isEqualTo("English");
             assertThat(res.getDefault()).isEqualTo(true);
         }
 
         @Test
         @DisplayName("400 response")
         public void responseWithStatus400Test() throws ApiException {
-            answerOnAnyRequest(400, readResourceFile(PAYLOADS_PATH + "responses/400.json"));
+            answerOnAnyRequest(400, readResourceFile(PAYLOADS_PATH + "responses/400-0.json"));
 
             ApiException e = assertThrows(ApiException.class,
-                    () -> api.update("vi4k0jvEUuaTdRAEjQ4Prklg", "en", new CaptionsUpdatePayload()));
+                    () -> api.update("vi4k0jvEUuaTdRAEjQ4Prklg", "en_", new CaptionsUpdatePayload()));
             assertThat(e.getCode()).isEqualTo(400);
-            assertThat(e).hasMessageThat().contains("string (required)");
+            assertThat(e).hasMessageThat().contains("An attribute is invalid.");
         }
 
         @Test
@@ -244,6 +247,7 @@ public class CaptionsApiTest extends AbstractApiTest {
             assertThat(res.getUri()).isEqualTo("/videos/vi3N6cDinStg3oBbN79GklWS/captions/en");
             assertThat(res.getSrc()).isEqualTo("https://cdn.api.video/vod/vi3N6cDinStg3oBbN79GklWS/captions/en.vtt");
             assertThat(res.getSrclang()).isEqualTo("en");
+            assertThat(res.getLanguageName()).isEqualTo("English");
             assertThat(res.getDefault()).isEqualTo(false);
         }
 
