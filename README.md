@@ -70,7 +70,7 @@ Add this dependency to your project's POM:
 <dependency>
   <groupId>video.api</groupId>
   <artifactId>android-api-client</artifactId>
-  <version>1.5.2</version>
+  <version>1.5.3</version>
   <scope>compile</scope>
 </dependency>
 ```
@@ -80,7 +80,7 @@ Add this dependency to your project's POM:
 Add this dependency to your project's build file:
 
 ```groovy
-implementation "video.api:android-api-client:1.5.2"
+implementation "video.api:android-api-client:1.5.3"
 ```
 
 #### Others
@@ -93,7 +93,7 @@ mvn clean package
 
 Then manually install the following JARs:
 
-* `target/android-api-client-1.5.2.jar`
+* `target/android-api-client-1.5.3.jar`
 * `target/lib/*.jar`
 
 ### Code sample
@@ -129,11 +129,58 @@ You have to add the following permissions in your `AndroidManifest.xml`:
 
 ```xml
     <uses-permission android:name="android.permission.INTERNET" />
-<!-- Application requires android.permission.READ_EXTERNAL_STORAGE to upload videos` -->
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
+    <!-- The application requires READ_EXTERNAL_STORAGE or READ_MEDIA_VIDEO to access video to upload them` -->
+    <uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
 ``` 
 
 Your application also has to dynamically request the `android.permission.READ_EXTERNAL_STORAGE` permission to upload videos.
+
+### WorkManager
+
+To upload with the `WorkManager`, you also have to add the following lines in your `AndroidManifest.xml`:
+
+```xml
+    <!-- The application requires POST_NOTIFICATIONS to display the upload notification -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <!-- The application requires FOREGROUND_SERVICE_DATA_SYNC for API >= 34 -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+
+    <application>
+      ...
+        <!-- The application requires to declare a service type for API >= 34 -->
+        <service
+            android:name="androidx.work.impl.foreground.SystemForegroundService"
+            android:foregroundServiceType="dataSync"
+            tools:node="merge" />
+    </application>
+```
+
+### UploadService
+
+
+To upload with the `UploadService`, you also have to add the following lines in your `AndroidManifest.xml`:
+
+```xml
+    <!-- The application requires POST_NOTIFICATIONS to display the upload notification -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+
+    <application>
+        <!--
+          The application requires to declare your service, replace `YourUploaderService` by the package
+          of your service or by the package of `UploadService` if you directly use `UploadService`.
+        -->
+        <service android:name=".YourUploaderService" />
+    </application>
+```
+
+
 
 ## Documentation
 
