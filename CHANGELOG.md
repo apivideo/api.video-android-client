@@ -1,6 +1,9 @@
 # Changelog
 All changes to this project will be documented in this file.
 
+## [1.5.4] - 2024-01-08
+- Upgrade dependencies, gradle and Kotlin
+
 ## [1.5.3] - 2023-12-14
 - Add support for API level >= 34 for WorkManager
 
