@@ -1,6 +1,9 @@
 # Changelog
 All changes to this project will be documented in this file.
 
+## [1.5.5] - 2024-02-19
+- Update VideoStatusIngest enum
+
 ## [1.5.4] - 2024-01-08
 - Upgrade dependencies, gradle and Kotlin
 
