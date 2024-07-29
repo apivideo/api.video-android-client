@@ -29,7 +29,7 @@ import java.io.Serializable;
  */
 @ApiModel(description = "Adding restream destinations is optional. However, if you set a restream destination, you must provide all attributes for each destination.")
 
-public class RestreamsRequestObject implements Serializable {
+public class RestreamsRequestObject implements Serializable, DeepObject {
     private static final long serialVersionUID = 1L;
 
     public static final String SERIALIZED_NAME_NAME = "name";
@@ -54,7 +54,7 @@ public class RestreamsRequestObject implements Serializable {
      * 
      * @return name
      **/
-    @ApiModelProperty(example = "My RTMP server", required = true, value = "Use this parameter to define a name for the restream destination.")
+    @ApiModelProperty(example = "My restream server", required = true, value = "Use this parameter to define a name for the restream destination.")
 
     public String getName() {
         return name;
@@ -70,11 +70,11 @@ public class RestreamsRequestObject implements Serializable {
     }
 
     /**
-     * Use this parameter to set the RTMP URL of the restream destination.
+     * Use this parameter to set the &#x60;RTMPS&#x60; or &#x60;RTMP&#x60; server URL of the restream destination.
      * 
      * @return serverUrl
      **/
-    @ApiModelProperty(example = "rtmp://my.broadcast.example.com/app", required = true, value = "Use this parameter to set the RTMP URL of the restream destination.")
+    @ApiModelProperty(example = "rtmp://my.broadcast.example.com/app", required = true, value = "Use this parameter to set the `RTMPS` or `RTMP` server URL of the restream destination.")
 
     public String getServerUrl() {
         return serverUrl;

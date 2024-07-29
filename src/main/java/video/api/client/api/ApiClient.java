@@ -12,6 +12,7 @@
 package video.api.client.api;
 
 import video.api.client.api.auth.ApiVideoAuthInterceptor;
+import video.api.client.api.models.DeepObject;
 import video.api.client.api.upload.UploadChunkRequestBody;
 import okhttp3.*;
 import okhttp3.internal.http.HttpMethod;
@@ -23,6 +24,7 @@ import okio.Okio;
 import org.threeten.bp.LocalDate;
 import org.threeten.bp.OffsetDateTime;
 import org.threeten.bp.format.DateTimeFormatter;
+import org.threeten.bp.ZoneId;
 
 import javax.net.ssl.*;
 import java.io.File;
@@ -118,7 +120,7 @@ public class ApiClient {
     private void init() {
         verifyingSsl = true;
         json = new JSON();
-        addDefaultHeader("AV-Origin-Client", "android:1.5.7");
+        addDefaultHeader("AV-Origin-Client", "android:1.6.0");
     }
 
     private boolean isValid(String regex, String field) {
@@ -452,9 +454,17 @@ public class ApiClient {
         if (param == null) {
             return "";
         } else if (param instanceof Date || param instanceof OffsetDateTime || param instanceof LocalDate) {
-            // Serialize to json string and remove the " enclosing characters
-            String jsonStr = json.serialize(param);
-            return jsonStr.substring(1, jsonStr.length() - 1);
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssXXX");
+
+            String formattedDate;
+            if (param instanceof OffsetDateTime) {
+                formattedDate = ((OffsetDateTime) param).format(formatter);
+            } else {
+                OffsetDateTime odt = ((LocalDate) param).atStartOfDay(ZoneId.systemDefault()).toOffsetDateTime();
+                formattedDate = odt.format(formatter);
+            }
+
+            return formattedDate;
         } else if (param instanceof Collection) {
             StringBuilder b = new StringBuilder();
             for (Object o : (Collection) param) {
@@ -494,6 +504,25 @@ public class ApiClient {
             map.forEach((k, v) -> {
                 if (k != null)
                     params.add(new Pair(name + "[" + k + "]", v == null ? null : v.toString()));
+            });
+            return params;
+        }
+
+        if (value instanceof DeepObject) {
+            Map<String, Object> map = json.deserialize(json.serialize(value), Map.class);
+            map.forEach((k, v) -> {
+                if (k != null) {
+                    if (v instanceof List) {
+                        List list = (List) v;
+                        for (int i = 0; i < list.size(); i++) {
+                            Object item = list.get(i);
+                            params.add(
+                                    new Pair(name + "[" + k + "][" + i + "]", item == null ? null : item.toString()));
+                        }
+                    } else {
+                        params.add(new Pair(name + "[" + k + "]", v == null ? null : v.toString()));
+                    }
+                }
             });
             return params;
         }
