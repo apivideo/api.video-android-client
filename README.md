@@ -70,7 +70,7 @@ Add this dependency to your project's POM:
 <dependency>
   <groupId>video.api</groupId>
   <artifactId>android-api-client</artifactId>
-  <version>1.6.1</version>
+  <version>1.6.2</version>
   <scope>compile</scope>
 </dependency>
 ```
@@ -80,7 +80,7 @@ Add this dependency to your project's POM:
 Add this dependency to your project's build file:
 
 ```groovy
-implementation "video.api:android-api-client:1.6.1"
+implementation "video.api:android-api-client:1.6.2"
 ```
 
 #### Others
@@ -93,7 +93,7 @@ mvn clean package
 
 Then manually install the following JARs:
 
-* `target/android-api-client-1.6.1.jar`
+* `target/android-api-client-1.6.2.jar`
 * `target/lib/*.jar`
 
 ### Code sample
@@ -346,7 +346,10 @@ Method | HTTP request | Description
 [**list**](https://github.com/apivideo/api.video-android-client/blob/main/docs/VideosApi.md#list) | **GET** `/videos` | List all video objects
 [**uploadThumbnail**](https://github.com/apivideo/api.video-android-client/blob/main/docs/VideosApi.md#uploadThumbnail) | **POST** `/videos/{videoId}/thumbnail` | Upload a thumbnail
 [**pickThumbnail**](https://github.com/apivideo/api.video-android-client/blob/main/docs/VideosApi.md#pickThumbnail) | **PATCH** `/videos/{videoId}/thumbnail` | Set a thumbnail
+[**getDiscarded**](https://github.com/apivideo/api.video-android-client/blob/main/docs/VideosApi.md#getDiscarded) | **GET** `/discarded/videos/{videoId}` | Retrieve a discarded video object
 [**getStatus**](https://github.com/apivideo/api.video-android-client/blob/main/docs/VideosApi.md#getStatus) | **GET** `/videos/{videoId}/status` | Retrieve video status and details
+[**listDiscarded**](https://github.com/apivideo/api.video-android-client/blob/main/docs/VideosApi.md#listDiscarded) | **GET** `/discarded/videos` | List all discarded video objects
+[**updateDiscarded**](https://github.com/apivideo/api.video-android-client/blob/main/docs/VideosApi.md#updateDiscarded) | **PATCH** `/discarded/videos/{videoId}` | Update a discarded video object
 
 
 ### WatermarksApi
@@ -415,6 +418,7 @@ Method | HTTP request | Description
  - [CaptionsUpdatePayload](https://github.com/apivideo/api.video-android-client/blob/main/docs/CaptionsUpdatePayload.md)
  - [Chapter](https://github.com/apivideo/api.video-android-client/blob/main/docs/Chapter.md)
  - [ChaptersListResponse](https://github.com/apivideo/api.video-android-client/blob/main/docs/ChaptersListResponse.md)
+ - [DiscardedVideoUpdatePayload](https://github.com/apivideo/api.video-android-client/blob/main/docs/DiscardedVideoUpdatePayload.md)
  - [FilterBy](https://github.com/apivideo/api.video-android-client/blob/main/docs/FilterBy.md)
  - [FilterBy1](https://github.com/apivideo/api.video-android-client/blob/main/docs/FilterBy1.md)
  - [FilterBy2](https://github.com/apivideo/api.video-android-client/blob/main/docs/FilterBy2.md)
