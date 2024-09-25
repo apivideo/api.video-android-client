@@ -8,6 +8,7 @@ import androidx.work.WorkManager
 import video.api.client.api.upload.IProgressiveUploadSession
 import video.api.client.api.work.UploadWorkerHelper.upload
 import video.api.client.api.work.stores.ProgressiveUploadSessionStore
+import video.api.client.api.work.utils.md5
 import video.api.client.api.work.workers.ProgressiveUploadWorker
 import video.api.client.api.work.workers.UploadWorker
 import java.io.File
@@ -418,7 +419,7 @@ object UploadWorkerHelper {
      * @return The tag
      */
     fun getTagForVideoId(videoId: String): String {
-        return "($PREFIX_VIDEO_ID$videoId)"
+        return "($PREFIX_VIDEO_ID${videoId.md5()})"
     }
 
     /**
@@ -428,7 +429,7 @@ object UploadWorkerHelper {
      * @return The tag
      */
     fun getTagForUploadToken(token: String): String {
-        return "($PREFIX_TOKEN$token)"
+        return "($PREFIX_TOKEN${token.md5()})"
     }
 
     private const val PREFIX_VIDEO_ID = "videoId="
