@@ -24,6 +24,7 @@
     - [ChaptersApi](#chaptersapi)
     - [LiveStreamsApi](#livestreamsapi)
     - [PlayerThemesApi](#playerthemesapi)
+    - [SummariesApi](#summariesapi)
     - [TagsApi](#tagsapi)
     - [UploadTokensApi](#uploadtokensapi)
     - [VideosApi](#videosapi)
@@ -71,7 +72,7 @@ Add this dependency to your project's POM:
 <dependency>
   <groupId>video.api</groupId>
   <artifactId>android-api-client</artifactId>
-  <version>1.6.4</version>
+  <version>1.6.5</version>
   <scope>compile</scope>
 </dependency>
 ```
@@ -81,7 +82,7 @@ Add this dependency to your project's POM:
 Add this dependency to your project's build file:
 
 ```groovy
-implementation "video.api:android-api-client:1.6.4"
+implementation "video.api:android-api-client:1.6.5"
 ```
 
 #### Others
@@ -94,7 +95,7 @@ mvn clean package
 
 Then manually install the following JARs:
 
-* `target/android-api-client-1.6.4.jar`
+* `target/android-api-client-1.6.5.jar`
 * `target/lib/*.jar`
 
 ### Code sample
@@ -304,6 +305,28 @@ Method | HTTP request | Description
 [**deleteLogo**](https://github.com/apivideo/api.video-android-client/blob/main/docs/PlayerThemesApi.md#deleteLogo) | **DELETE** `/players/{playerId}/logo` | Delete logo
 
 
+### SummariesApi
+
+
+#### Retrieve an instance of SummariesApi:
+```kotlin
+val client = ApiVideoClient("YOUR_API_KEY")
+val summaries = client.summaries()
+```
+
+
+
+#### Endpoints
+
+Method | HTTP request | Description
+------------- | ------------- | -------------
+[**create**](https://github.com/apivideo/api.video-android-client/blob/main/docs/SummariesApi.md#create) | **POST** `/summaries` | Generate video summary
+[**update**](https://github.com/apivideo/api.video-android-client/blob/main/docs/SummariesApi.md#update) | **PATCH** `/summaries/{summaryId}/source` | Update summary details
+[**delete**](https://github.com/apivideo/api.video-android-client/blob/main/docs/SummariesApi.md#delete) | **DELETE** `/summaries/{summaryId}` | Delete video summary
+[**list**](https://github.com/apivideo/api.video-android-client/blob/main/docs/SummariesApi.md#list) | **GET** `/summaries` | List summaries
+[**getSummarySource**](https://github.com/apivideo/api.video-android-client/blob/main/docs/SummariesApi.md#getSummarySource) | **GET** `/summaries/{summaryId}/source` | Get summary details
+
+
 ### TagsApi
 
 
@@ -439,6 +462,7 @@ Method | HTTP request | Description
  - [CaptionsUpdatePayload](https://github.com/apivideo/api.video-android-client/blob/main/docs/CaptionsUpdatePayload.md)
  - [Chapter](https://github.com/apivideo/api.video-android-client/blob/main/docs/Chapter.md)
  - [ChaptersListResponse](https://github.com/apivideo/api.video-android-client/blob/main/docs/ChaptersListResponse.md)
+ - [ConflictError](https://github.com/apivideo/api.video-android-client/blob/main/docs/ConflictError.md)
  - [DiscardedVideoUpdatePayload](https://github.com/apivideo/api.video-android-client/blob/main/docs/DiscardedVideoUpdatePayload.md)
  - [FilterBy](https://github.com/apivideo/api.video-android-client/blob/main/docs/FilterBy.md)
  - [FilterBy1](https://github.com/apivideo/api.video-android-client/blob/main/docs/FilterBy1.md)
@@ -466,6 +490,11 @@ Method | HTTP request | Description
  - [RefreshTokenPayload](https://github.com/apivideo/api.video-android-client/blob/main/docs/RefreshTokenPayload.md)
  - [RestreamsRequestObject](https://github.com/apivideo/api.video-android-client/blob/main/docs/RestreamsRequestObject.md)
  - [RestreamsResponseObject](https://github.com/apivideo/api.video-android-client/blob/main/docs/RestreamsResponseObject.md)
+ - [SummariesListResponse](https://github.com/apivideo/api.video-android-client/blob/main/docs/SummariesListResponse.md)
+ - [Summary](https://github.com/apivideo/api.video-android-client/blob/main/docs/Summary.md)
+ - [SummaryCreationPayload](https://github.com/apivideo/api.video-android-client/blob/main/docs/SummaryCreationPayload.md)
+ - [SummarySource](https://github.com/apivideo/api.video-android-client/blob/main/docs/SummarySource.md)
+ - [SummaryUpdatePayload](https://github.com/apivideo/api.video-android-client/blob/main/docs/SummaryUpdatePayload.md)
  - [TokenCreationPayload](https://github.com/apivideo/api.video-android-client/blob/main/docs/TokenCreationPayload.md)
  - [TokenListResponse](https://github.com/apivideo/api.video-android-client/blob/main/docs/TokenListResponse.md)
  - [TooManyRequests](https://github.com/apivideo/api.video-android-client/blob/main/docs/TooManyRequests.md)
